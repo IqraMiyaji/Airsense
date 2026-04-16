@@ -1,0 +1,2644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AirSense Mumbai — AQI Intelligence Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg: #05070f;
+  --bg2: #0a0d1a;
+  --bg3: #0f1225;
+  --card: #111629;
+  --card2: #161c35;
+  --border: rgba(99,120,255,0.15);
+  --accent: #6378ff;
+  --accent2: #38d9a9;
+  --accent3: #ff6b6b;
+  --accent4: #ffd43b;
+  --text: #e8ecff;
+  --text2: #8891bb;
+  --text3: #555f8a;
+  --good: #38d9a9;
+  --moderate: #ffd43b;
+  --poor: #ff922b;
+  --vp: #ff6b6b;
+  --hazardous: #c92a2a;
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'Space Grotesk', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --radius: 16px;
+  --shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+/* Kid theme */
+.theme-kid {
+  --bg: #fff9f0;
+  --bg2: #fff3e0;
+  --bg3: #ffe8cc;
+  --card: #ffffff;
+  --card2: #fff8f0;
+  --border: rgba(255,153,0,0.25);
+  --accent: #ff6b35;
+  --accent2: #4caf50;
+  --text: #2d1b00;
+  --text2: #7a4f00;
+  --text3: #b07a30;
+}
+/* Youth theme */
+.theme-youth {
+  --bg: #0a0a14;
+  --bg2: #0d0d1f;
+  --bg3: #111128;
+  --card: #13132a;
+  --card2: #18183a;
+  --border: rgba(120,80,255,0.2);
+  --accent: #7b5cff;
+  --accent2: #00e5ff;
+}
+/* Adult theme */
+.theme-adult {
+  --bg: #f8f9fc;
+  --bg2: #f0f2f8;
+  --bg3: #e8ecf5;
+  --card: #ffffff;
+  --card2: #f5f7ff;
+  --border: rgba(63,94,251,0.15);
+  --accent: #3f5efb;
+  --accent2: #00b894;
+  --text: #1a1a2e;
+  --text2: #4a5070;
+  --text3: #8890b0;
+}
+/* Senior theme */
+.theme-senior {
+  --bg: #f0f4f8;
+  --bg2: #e8eef5;
+  --bg3: #dde6f0;
+  --card: #ffffff;
+  --card2: #f5f8ff;
+  --border: rgba(0,82,204,0.2);
+  --accent: #0052cc;
+  --accent2: #00875a;
+  --text: #091e42;
+  --text2: #344563;
+  --text3: #6b778c;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  transition: all 0.4s ease;
+}
+
+/* AUTH SCREEN */
+#auth-screen {
+  position: fixed; inset: 0;
+  background: linear-gradient(135deg, #05070f 0%, #0a0d1a 50%, #0f0820 100%);
+  display: flex; align-items: flex-start; justify-content: center;
+  z-index: 9999;
+  overflow-y: auto;
+  padding: 40px 16px;
+  animation: fadeIn 0.5s ease;
+}
+.auth-container {
+  width: 100%;
+  max-width: 460px;
+  background: rgba(17,22,41,0.9);
+  border: 1px solid rgba(99,120,255,0.2);
+  border-radius: 24px;
+  padding: 40px;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+  flex-shrink: 0;
+}
+.auth-logo {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #6378ff, #38d9a9);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 8px;
+}
+.auth-subtitle { color: #8891bb; font-size: 14px; margin-bottom: 36px; }
+.auth-tabs {
+  display: flex; gap: 4px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 12px; padding: 4px;
+  margin-bottom: 28px;
+}
+.auth-tab {
+  flex: 1; padding: 10px;
+  border: none; background: transparent;
+  color: #8891bb; font-family: var(--font-body);
+  font-size: 14px; font-weight: 500;
+  border-radius: 10px; cursor: pointer;
+  transition: all 0.2s;
+}
+.auth-tab.active {
+  background: rgba(99,120,255,0.2);
+  color: #e8ecff;
+}
+.auth-field { margin-bottom: 16px; }
+.auth-field label { display: block; font-size: 13px; color: #8891bb; margin-bottom: 6px; }
+.auth-field input, .auth-field select {
+  width: 100%; padding: 12px 16px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(99,120,255,0.2);
+  border-radius: 10px; color: #e8ecff;
+  font-family: var(--font-body); font-size: 14px;
+  outline: none; transition: border-color 0.2s;
+}
+.auth-field input:focus, .auth-field select:focus { border-color: rgba(99,120,255,0.6); }
+.auth-field select option { background: #111629; }
+.age-group-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 8px; margin-top: 8px;
+}
+.age-option {
+  padding: 12px; border: 1.5px solid rgba(99,120,255,0.2);
+  border-radius: 10px; cursor: pointer;
+  text-align: center; transition: all 0.2s;
+  background: rgba(255,255,255,0.03);
+}
+.age-option:hover { border-color: rgba(99,120,255,0.5); background: rgba(99,120,255,0.1); }
+.age-option.selected { border-color: #6378ff; background: rgba(99,120,255,0.2); }
+.age-option .age-icon { font-size: 24px; margin-bottom: 4px; }
+.age-option .age-label { font-size: 12px; font-weight: 600; color: #e8ecff; }
+.age-option .age-desc { font-size: 11px; color: #8891bb; margin-top: 2px; }
+.auth-btn {
+  width: 100%; padding: 14px;
+  background: linear-gradient(135deg, #6378ff, #38d9a9);
+  border: none; border-radius: 12px;
+  color: white; font-family: var(--font-body);
+  font-size: 15px; font-weight: 600;
+  cursor: pointer; margin-top: 8px;
+  transition: opacity 0.2s, transform 0.2s;
+}
+.auth-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+.auth-error { color: #ff6b6b; font-size: 13px; margin-top: 8px; display: none; }
+
+/* PARTICLES */
+.particles {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+}
+.particle {
+  position: absolute; border-radius: 50%;
+  background: rgba(99,120,255,0.3);
+  animation: float linear infinite;
+}
+@keyframes float {
+  0% { transform: translateY(100vh) scale(0); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 0.5; }
+  100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+
+/* MAIN APP */
+#app { display: none; min-height: 100vh; }
+
+/* NAVBAR */
+.navbar {
+  position: fixed; top: 0; left: 0; right: 0; height: 64px;
+  background: rgba(var(--bg-rgb, 5,7,15),0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center;
+  padding: 0 24px; gap: 8px; z-index: 100;
+  justify-content: space-between;
+}
+.nav-brand {
+  font-family: var(--font-display);
+  font-size: 20px; font-weight: 800;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  white-space: nowrap;
+}
+.nav-links { display: flex; gap: 4px; align-items: center; }
+.nav-link {
+  padding: 8px 14px; border-radius: 10px;
+  border: none; background: transparent;
+  color: var(--text2); font-family: var(--font-body);
+  font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: all 0.2s; white-space: nowrap;
+}
+.nav-link:hover { background: rgba(99,120,255,0.1); color: var(--text); }
+.nav-link.active { background: rgba(99,120,255,0.15); color: var(--accent); }
+.nav-right { display: flex; align-items: center; gap: 12px; }
+.nav-aqi-badge {
+  padding: 6px 14px; border-radius: 20px;
+  font-size: 13px; font-weight: 700;
+  font-family: var(--font-mono);
+}
+.nav-user {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; color: white;
+  cursor: pointer;
+}
+.theme-badge {
+  font-size: 11px; padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px; color: var(--text3);
+  font-family: var(--font-mono);
+}
+
+/* MAIN CONTENT */
+.main { padding-top: 64px; }
+.page { display: none; animation: slideUp 0.4s ease; }
+.page.active { display: block; }
+
+/* CONTAINERS */
+.container { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+.page-title {
+  font-family: var(--font-display);
+  font-size: 32px; font-weight: 800;
+  margin-bottom: 4px;
+}
+.page-sub { color: var(--text2); font-size: 14px; margin-bottom: 32px; }
+
+/* GRID LAYOUTS */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
+.grid-auto { display: grid; grid-template-columns: repeat(auto-fill,minmax(280px,1fr)); gap: 20px; }
+
+/* CARDS */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--shadow);
+}
+.card-title {
+  font-size: 12px; font-weight: 600; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--text3); margin-bottom: 16px;
+}
+.card-value {
+  font-family: var(--font-mono);
+  font-size: 36px; font-weight: 700;
+  color: var(--text);
+}
+.card-sub { font-size: 12px; color: var(--text2); margin-top: 4px; }
+
+/* AQI GAUGE */
+.aqi-hero {
+  background: linear-gradient(135deg, var(--card) 0%, var(--card2) 100%);
+  border: 1px solid var(--border);
+  border-radius: 24px; padding: 40px;
+  text-align: center; position: relative; overflow: hidden;
+}
+.aqi-hero::before {
+  content: ''; position: absolute;
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(99,120,255,0.15) 0%, transparent 70%);
+  top: -100px; right: -100px; border-radius: 50%;
+}
+.aqi-value-big {
+  font-family: var(--font-display);
+  font-size: 96px; font-weight: 800;
+  line-height: 1;
+}
+.aqi-label { font-size: 18px; font-weight: 600; margin-top: 8px; }
+.aqi-bar-wrap { margin: 24px 0; }
+.aqi-bar {
+  height: 12px; border-radius: 6px;
+  background: linear-gradient(to right, #38d9a9, #ffd43b, #ff922b, #ff6b6b, #c92a2a, #7950f2);
+  position: relative;
+}
+.aqi-needle {
+  position: absolute; top: -4px;
+  width: 4px; height: 20px;
+  background: white; border-radius: 2px;
+  box-shadow: 0 0 8px rgba(255,255,255,0.8);
+  transition: left 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.aqi-legend {
+  display: flex; justify-content: space-between;
+  font-size: 10px; color: var(--text3); margin-top: 6px;
+  font-family: var(--font-mono);
+}
+.aqi-meta { display: flex; gap: 24px; justify-content: center; margin-top: 24px; }
+.aqi-meta-item { text-align: center; }
+.aqi-meta-val { font-family: var(--font-mono); font-size: 18px; font-weight: 600; }
+.aqi-meta-key { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.accuracy-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(99,120,255,0.1);
+  border: 1px solid rgba(99,120,255,0.3);
+  border-radius: 20px; padding: 6px 14px;
+  font-family: var(--font-mono); font-size: 12px;
+  color: var(--accent); margin-top: 16px;
+}
+.last-updated { font-size: 11px; color: var(--text3); margin-top: 8px; }
+
+/* STAT CARDS */
+.stat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+.stat-icon { font-size: 28px; margin-bottom: 12px; }
+.stat-val { font-family: var(--font-mono); font-size: 28px; font-weight: 700; }
+.stat-label { font-size: 12px; color: var(--text2); margin-top: 4px; }
+.stat-trend { font-size: 12px; margin-top: 8px; }
+.trend-up { color: var(--vp); }
+.trend-down { color: var(--good); }
+
+/* CHARTS */
+.chart-wrap { position: relative; height: 280px; }
+.chart-wrap-tall { position: relative; height: 360px; }
+
+/* HEALTH STATUS BAR */
+.health-status {
+  display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px;
+}
+.health-pill {
+  padding: 8px 16px; border-radius: 20px;
+  font-size: 13px; font-weight: 600;
+  border: 1.5px solid currentColor;
+}
+
+/* MUMBAI MAP */
+.mumbai-map-container {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+}
+.area-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(150px,1fr));
+  gap: 10px; margin-top: 16px;
+}
+.area-btn {
+  padding: 10px 14px; border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: var(--card2); color: var(--text);
+  font-family: var(--font-body); font-size: 13px;
+  cursor: pointer; transition: all 0.2s; text-align: center;
+}
+.area-btn:hover { border-color: var(--accent); transform: translateY(-2px); }
+.area-btn.selected { border-color: var(--accent); background: rgba(99,120,255,0.1); color: var(--accent); }
+.area-aqi { font-family: var(--font-mono); font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+/* KID THEME EXTRAS */
+.theme-kid .aqi-value-big { filter: drop-shadow(0 0 20px #ff6b35); }
+.theme-kid .card { border-radius: 20px; border-color: rgba(255,153,0,0.25); }
+.theme-kid .nav-brand { color: #ff6b35; }
+.badge-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.badge {
+  padding: 6px 12px; border-radius: 20px;
+  font-size: 12px; font-weight: 600;
+  background: rgba(99,120,255,0.1);
+  border: 1.5px solid rgba(99,120,255,0.3);
+  color: var(--accent);
+}
+
+/* PLANTS CALCULATOR */
+.plant-form { display: flex; flex-direction: column; gap: 16px; }
+.form-row { display: flex; gap: 16px; }
+.form-field { flex: 1; }
+.form-field label { display: block; font-size: 13px; color: var(--text2); margin-bottom: 6px; }
+.form-field input {
+  width: 100%; padding: 10px 14px;
+  background: var(--card2); border: 1px solid var(--border);
+  border-radius: 10px; color: var(--text);
+  font-family: var(--font-body); font-size: 14px; outline: none;
+}
+.calc-btn {
+  padding: 12px 24px; border-radius: 10px;
+  border: none; background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: white; font-family: var(--font-body); font-size: 14px;
+  font-weight: 600; cursor: pointer; transition: all 0.2s;
+}
+.calc-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+.plant-results { display: none; }
+.plant-card {
+  display: flex; align-items: center; gap: 16px;
+  padding: 16px; border-radius: 12px;
+  background: var(--card2); border: 1px solid var(--border);
+  margin-bottom: 10px;
+}
+.plant-emoji { font-size: 40px; }
+.plant-info h4 { font-size: 16px; font-weight: 600; }
+.plant-info p { font-size: 13px; color: var(--text2); margin-top: 2px; }
+.plant-buy-link {
+  margin-left: auto; padding: 8px 14px;
+  border-radius: 8px; border: 1px solid var(--accent);
+  color: var(--accent); text-decoration: none;
+  font-size: 12px; font-weight: 600;
+  transition: all 0.2s;
+}
+.plant-buy-link:hover { background: rgba(99,120,255,0.1); }
+
+/* SKINCARE */
+.skincare-meter {
+  background: var(--card2); border-radius: 12px; padding: 20px; margin-bottom: 16px;
+}
+.skin-risk-bar {
+  height: 8px; border-radius: 4px;
+  background: linear-gradient(to right, var(--good), var(--moderate), var(--poor), var(--vp));
+  margin: 12px 0; position: relative;
+}
+.skin-needle {
+  position: absolute; top: -4px;
+  width: 4px; height: 16px;
+  background: white; border-radius: 2px;
+  box-shadow: 0 0 6px rgba(255,255,255,0.6);
+  transition: left 0.8s ease;
+}
+.skin-ssi {
+  font-family: var(--font-mono); font-size: 40px;
+  font-weight: 700; text-align: center; margin: 8px 0;
+}
+.skincare-tip {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 12px 16px; border-radius: 10px;
+  background: var(--card2); border: 1px solid var(--border); margin-bottom: 8px;
+}
+.skincare-tip-icon { font-size: 20px; flex-shrink: 0; }
+.skincare-tip-text { font-size: 13px; color: var(--text2); line-height: 1.5; }
+
+/* CHATBOT */
+.chatbot-fab {
+  position: fixed; bottom: 28px; right: 28px;
+  width: 56px; height: 56px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border: none; cursor: pointer; z-index: 200;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; box-shadow: 0 8px 24px rgba(99,120,255,0.4);
+  transition: transform 0.2s;
+}
+.chatbot-fab:hover { transform: scale(1.1); }
+.chatbot-panel {
+  position: fixed; bottom: 96px; right: 28px;
+  width: 360px; height: 520px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  display: none; flex-direction: column;
+  z-index: 200; box-shadow: 0 24px 64px rgba(0,0,0,0.4);
+  overflow: hidden;
+}
+.chatbot-panel.open { display: flex; animation: slideUp 0.3s ease; }
+.chat-header {
+  padding: 16px 20px;
+  background: linear-gradient(135deg, rgba(99,120,255,0.2), rgba(56,217,169,0.1));
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 12px;
+}
+.chat-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  display: flex; align-items: center; justify-content: center; font-size: 18px;
+}
+.chat-header-info h4 { font-size: 14px; font-weight: 600; }
+.chat-header-info p { font-size: 11px; color: var(--text3); }
+.chat-close {
+  margin-left: auto; background: none; border: none;
+  color: var(--text2); cursor: pointer; font-size: 18px; padding: 4px;
+}
+.chat-messages {
+  flex: 1; overflow-y: auto; padding: 16px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.chat-msg {
+  max-width: 80%; padding: 10px 14px; border-radius: 14px;
+  font-size: 13px; line-height: 1.5;
+}
+.chat-msg.bot {
+  background: var(--card); border: 1px solid var(--border);
+  color: var(--text); align-self: flex-start;
+  border-bottom-left-radius: 4px;
+}
+.chat-msg.user {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: white; align-self: flex-end;
+  border-bottom-right-radius: 4px;
+}
+.chat-input-row {
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+  display: flex; gap: 8px;
+}
+.chat-input {
+  flex: 1; padding: 10px 14px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 10px; color: var(--text);
+  font-family: var(--font-body); font-size: 13px; outline: none;
+}
+.chat-send {
+  padding: 10px 16px; border-radius: 10px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border: none; color: white; cursor: pointer; font-size: 16px;
+}
+.typing-indicator {
+  display: none; align-self: flex-start;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 10px 14px;
+}
+.typing-dots { display: flex; gap: 4px; }
+.typing-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--text3); animation: bounce 1s infinite;
+}
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+/* NEWS */
+.news-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 20px;
+  margin-bottom: 12px; transition: transform 0.2s;
+}
+.news-card:hover { transform: translateY(-2px); }
+.news-source { font-size: 11px; color: var(--accent); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.news-title { font-size: 15px; font-weight: 600; margin: 6px 0; line-height: 1.4; }
+.news-snippet { font-size: 13px; color: var(--text2); line-height: 1.5; }
+.news-date { font-size: 11px; color: var(--text3); margin-top: 8px; font-family: var(--font-mono); }
+
+/* TEAM */
+.team-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 32px 24px;
+  text-align: center;
+}
+.team-avatar {
+  width: 96px; height: 96px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  margin: 0 auto 16px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 40px; font-weight: 700; color: white;
+}
+.team-name { font-size: 18px; font-weight: 700; }
+.team-degree { font-size: 13px; color: var(--text3); margin-top: 2px; }
+.team-links { display: flex; gap: 8px; justify-content: center; margin-top: 16px; }
+.team-link {
+  padding: 8px 16px; border-radius: 8px;
+  border: 1px solid var(--border); color: var(--text2);
+  text-decoration: none; font-size: 12px; font-weight: 500;
+  transition: all 0.2s;
+}
+.team-link:hover { border-color: var(--accent); color: var(--accent); }
+.team-achievements { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+.achievement-tag {
+  padding: 4px 10px; border-radius: 6px;
+  font-size: 11px; background: rgba(99,120,255,0.1);
+  color: var(--accent); border: 1px solid rgba(99,120,255,0.2);
+}
+
+/* PREDICTION PAGE */
+.filter-tabs { display: flex; gap: 4px; margin-bottom: 20px; }
+.filter-tab {
+  padding: 8px 16px; border-radius: 8px;
+  border: 1px solid var(--border);
+  background: transparent; color: var(--text2);
+  font-family: var(--font-body); font-size: 13px;
+  cursor: pointer; transition: all 0.2s;
+}
+.filter-tab.active { background: rgba(99,120,255,0.15); color: var(--accent); border-color: rgba(99,120,255,0.3); }
+
+/* SENIOR OVERRIDES */
+.theme-senior .page-title { font-size: 40px; }
+.theme-senior .card-value { font-size: 44px; }
+.theme-senior .nav-link { font-size: 15px; }
+.theme-senior .chat-msg { font-size: 15px; }
+.voice-btn {
+  display: none;
+  padding: 10px 20px; border-radius: 10px;
+  background: rgba(0,82,204,0.15);
+  border: 1px solid rgba(0,82,204,0.3);
+  color: #0052cc; font-family: var(--font-body);
+  font-size: 14px; cursor: pointer;
+}
+.theme-senior .voice-btn { display: inline-flex; align-items: center; gap: 8px; }
+
+/* HEALTH ALERT BANNER */
+.health-alert {
+  padding: 16px 20px; border-radius: 12px;
+  border-left: 4px solid;
+  margin-bottom: 16px;
+  display: flex; align-items: center; gap: 12px;
+}
+.health-alert.danger { background: rgba(255,107,107,0.1); border-color: var(--vp); }
+.health-alert.warning { background: rgba(255,212,59,0.1); border-color: var(--moderate); }
+.health-alert.good { background: rgba(56,217,169,0.1); border-color: var(--good); }
+.alert-icon { font-size: 24px; }
+.alert-text h4 { font-size: 14px; font-weight: 600; }
+.alert-text p { font-size: 13px; color: var(--text2); margin-top: 2px; }
+
+/* KID GAMIFICATION */
+.kid-aqi-meter {
+  display: flex; gap: 12px; flex-wrap: wrap; margin: 16px 0;
+}
+.kid-face {
+  width: 64px; height: 64px; border-radius: 50%;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; font-size: 28px;
+  border: 3px solid transparent; cursor: default;
+  transition: all 0.3s;
+}
+.kid-face.active { transform: scale(1.2); border-color: currentColor; }
+.progress-bar-kid {
+  height: 20px; border-radius: 10px; overflow: hidden;
+  background: rgba(0,0,0,0.1); margin: 12px 0;
+}
+.progress-fill {
+  height: 100%; border-radius: 10px;
+  background: linear-gradient(to right, #38d9a9, #ffd43b, #ff6b6b);
+  transition: width 1s ease;
+}
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* =============================================
+   RESPONSIVE — Mobile-first, 3 breakpoints
+   xs: <480px  sm: 480–768px  md: 768–1024px
+   ============================================= */
+
+/* HAMBURGER BUTTON */
+.nav-hamburger {
+  display: none;
+  flex-direction: column; justify-content: center; align-items: center;
+  gap: 5px; width: 40px; height: 40px;
+  background: transparent; border: none; cursor: pointer;
+  padding: 4px; border-radius: 8px;
+  transition: background 0.2s;
+}
+.nav-hamburger:hover { background: rgba(99,120,255,0.1); }
+.hamburger-line {
+  width: 22px; height: 2px;
+  background: var(--text2); border-radius: 2px;
+  transition: all 0.3s ease;
+}
+.nav-hamburger.open .hamburger-line:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-hamburger.open .hamburger-line:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.nav-hamburger.open .hamburger-line:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* MOBILE DRAWER */
+.mobile-nav-drawer {
+  display: none;
+  position: fixed; top: 64px; left: 0; right: 0;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 16px 20px;
+  z-index: 99;
+  flex-direction: column; gap: 4px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+  animation: slideDown 0.25s ease;
+}
+.mobile-nav-drawer.open { display: flex; }
+@keyframes slideDown { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
+.mobile-nav-drawer .nav-link {
+  width: 100%; text-align: left;
+  padding: 12px 16px; font-size: 15px;
+  border-radius: 10px;
+}
+.mobile-nav-drawer .nav-link:hover { background: rgba(99,120,255,0.1); }
+
+/* ─── TABLET: 768–1024px ─── */
+@media (max-width: 1024px) {
+  .grid-4 { grid-template-columns: 1fr 1fr; gap: 14px; }
+  .grid-3 { grid-template-columns: 1fr 1fr; gap: 16px; }
+  .container { padding: 28px 20px; }
+  .aqi-value-big { font-size: 72px; }
+  .aqi-meta { gap: 16px; }
+  .nav-links .nav-link { padding: 8px 10px; font-size: 12px; }
+}
+
+/* ─── MOBILE: ≤768px ─── */
+@media (max-width: 768px) {
+  /* Layout */
+  .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; gap: 14px; }
+  .container { padding: 20px 14px; }
+
+  /* Auth */
+  #auth-screen { align-items: flex-start; padding-top: 40px; overflow-y: auto; }
+  .auth-container { width: calc(100% - 24px); margin: 12px; padding: 28px 20px; }
+  .age-group-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+
+  /* Navbar */
+  .nav-links { display: none !important; }
+  .nav-hamburger { display: flex; }
+  .navbar { padding: 0 16px; gap: 10px; }
+  .nav-brand { font-size: 17px; }
+  .theme-badge { display: none; }
+  .nav-aqi-badge { font-size: 11px; padding: 4px 10px; }
+
+  /* Page titles */
+  .page-title { font-size: 24px; }
+  .page-sub { font-size: 13px; margin-bottom: 20px; }
+  .section-title { font-size: 17px; }
+
+  /* AQI Hero */
+  .aqi-hero { padding: 24px 18px; }
+  .aqi-value-big { font-size: 72px; }
+  .aqi-meta { gap: 12px; flex-wrap: wrap; justify-content: center; }
+  .aqi-meta-item { min-width: 70px; }
+  .accuracy-badge { font-size: 11px; padding: 5px 12px; }
+
+  /* Cards */
+  .card { padding: 18px 16px; }
+  .card-value { font-size: 28px; }
+  .stat-val { font-size: 24px; }
+  .stat-card { padding: 16px; }
+
+  /* Charts */
+  .chart-wrap { height: 220px; }
+  .chart-wrap-tall { height: 260px; }
+
+  /* Weekly forecast — scrollable row */
+  .week-forecast { gap: 8px; }
+  .day-forecast { width: 85px; padding: 10px 8px; }
+  .day-aqi { font-size: 18px; }
+
+  /* Chatbot */
+  .chatbot-panel {
+    width: calc(100vw - 24px);
+    right: 12px; bottom: 84px;
+    height: 460px;
+  }
+  .chatbot-fab { bottom: 20px; right: 16px; width: 50px; height: 50px; font-size: 20px; }
+
+  /* Team cards */
+  .team-card { padding: 24px 16px; }
+  .team-avatar { width: 80px; height: 80px; font-size: 32px; }
+  .team-links { flex-wrap: wrap; }
+
+  /* Indoor plant card */
+  .plant-card { flex-wrap: wrap; gap: 10px; }
+  .plant-buy-link { margin-left: 0; }
+  .form-row { flex-direction: column; gap: 12px; }
+
+  /* Filter tabs */
+  .filter-tabs { flex-wrap: wrap; gap: 6px; }
+  .filter-tab { padding: 7px 12px; font-size: 12px; }
+
+  /* Prediction table — horizontal scroll */
+  .card div[style*="overflow-x"] { -webkit-overflow-scrolling: touch; }
+  #pred-table { font-size: 12px; min-width: 480px; }
+  #pred-table th, #pred-table td { padding: 8px 6px; }
+
+  /* Mumbai area grid */
+  .area-grid { grid-template-columns: repeat(auto-fill, minmax(120px,1fr)); gap: 8px; }
+  .area-btn { padding: 8px 10px; font-size: 12px; }
+
+  /* Health alert */
+  .health-alert { padding: 12px 14px; gap: 8px; }
+  .alert-icon { font-size: 20px; }
+
+  /* Kid elements */
+  .kid-face { width: 54px; height: 54px; font-size: 22px; }
+  .progress-bar-kid { height: 16px; }
+
+  /* Skincare */
+  .skincare-meter { padding: 16px; }
+  .skin-ssi { font-size: 32px; }
+
+  /* DIY steps */
+  .diy-step { padding: 12px; gap: 12px; }
+
+  /* News */
+  .news-card { padding: 16px; }
+  .news-title { font-size: 14px; }
+
+  /* Senior welcome */
+  #senior-welcome div { font-size: 22px; }
+}
+
+/* ─── SMALL PHONES: ≤480px ─── */
+@media (max-width: 480px) {
+  .container { padding: 16px 12px; }
+
+  /* Auth */
+  .auth-container { padding: 24px 16px; }
+  .auth-logo { font-size: 22px; }
+  .age-group-grid { grid-template-columns: 1fr 1fr; }
+  .age-option { padding: 10px 8px; }
+  .age-option .age-icon { font-size: 20px; }
+  .age-option .age-label { font-size: 11px; }
+  .age-option .age-desc { font-size: 10px; }
+
+  /* AQI hero */
+  .aqi-hero { padding: 20px 14px; }
+  .aqi-value-big { font-size: 56px; }
+  .aqi-label { font-size: 15px; }
+  .aqi-meta { gap: 10px; }
+  .aqi-meta-val { font-size: 16px; }
+
+  /* Navbar */
+  .navbar { padding: 0 12px; }
+  .nav-brand { font-size: 15px; }
+  .nav-aqi-badge { display: none; }
+  .nav-user { width: 32px; height: 32px; font-size: 13px; }
+
+  /* Page titles */
+  .page-title { font-size: 20px; }
+  .section-title { font-size: 15px; }
+
+  /* Cards */
+  .card { padding: 14px 12px; border-radius: 12px; }
+  .card-value { font-size: 24px; }
+  .stat-val { font-size: 20px; }
+
+  /* Charts */
+  .chart-wrap { height: 190px; }
+  .chart-wrap-tall { height: 230px; }
+
+  /* Week forecast */
+  .day-forecast { width: 75px; }
+  .day-aqi { font-size: 16px; }
+  .day-name { font-size: 10px; }
+
+  /* Team */
+  .team-avatar { width: 70px; height: 70px; font-size: 28px; }
+  .team-name { font-size: 16px; }
+
+  /* Kid faces row — 2 per line */
+  .kid-aqi-meter { gap: 8px; }
+  .kid-face { width: 48px; height: 48px; font-size: 20px; }
+
+  /* Chatbot */
+  .chatbot-panel { width: calc(100vw - 16px); right: 8px; height: 420px; }
+  .chatbot-fab { right: 12px; bottom: 16px; }
+
+  /* Plant card */
+  .plant-emoji { font-size: 30px; }
+  .plant-info h4 { font-size: 14px; }
+
+  /* Model accuracy cards — 1 col on tiny screens */
+  .card[style*="flex:1"] { min-width: 100% !important; }
+
+  /* Area grid — 2 cols fixed */
+  .area-grid { grid-template-columns: 1fr 1fr; }
+
+  /* Skincare */
+  .skin-ssi { font-size: 28px; }
+
+  /* Filter tabs */
+  .filter-tab { flex: 1; text-align: center; }
+  .filter-tabs { display: flex; }
+}
+
+/* ─── LANDSCAPE PHONE ─── */
+@media (max-width: 768px) and (orientation: landscape) {
+  .aqi-hero { padding: 16px; }
+  .aqi-value-big { font-size: 48px; }
+  .chart-wrap { height: 180px; }
+  .chart-wrap-tall { height: 200px; }
+  .chatbot-panel { height: 85vh; bottom: 60px; }
+  .container { padding: 16px 14px; }
+}
+
+/* ─── TABLET PORTRAIT: 481–768px ─── */
+@media (min-width: 481px) and (max-width: 768px) {
+  .grid-4 { grid-template-columns: 1fr 1fr; }
+  .aqi-value-big { font-size: 80px; }
+  .week-forecast { justify-content: flex-start; }
+}
+
+/* SECTION TITLE */
+.section-title {
+  font-family: var(--font-display);
+  font-size: 20px; font-weight: 700; margin-bottom: 16px;
+}
+.divider { height: 1px; background: var(--border); margin: 24px 0; }
+
+/* LOADING */
+.loading-spinner {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto;
+}
+.loading-text { text-align: center; color: var(--text3); font-size: 13px; margin-top: 12px; }
+
+/* WEEKLY FORECAST */
+.week-forecast { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; }
+.day-forecast {
+  flex-shrink: 0; width: 100px;
+  background: var(--card2); border: 1px solid var(--border);
+  border-radius: 12px; padding: 14px 10px;
+  text-align: center;
+}
+.day-name { font-size: 12px; color: var(--text3); font-weight: 600; }
+.day-aqi { font-family: var(--font-mono); font-size: 22px; font-weight: 700; margin: 8px 0; }
+.day-cat { font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 10px; }
+
+/* AQI COLOR HELPERS */
+.aqi-good { color: var(--good); }
+.aqi-moderate { color: var(--moderate); }
+.aqi-poor { color: var(--poor); }
+.aqi-vp { color: var(--vp); }
+.aqi-hazardous { color: #7950f2; }
+
+.bg-good { background: rgba(56,217,169,0.15); color: var(--good); }
+.bg-moderate { background: rgba(255,212,59,0.15); color: var(--moderate); }
+.bg-poor { background: rgba(255,146,43,0.15); color: var(--poor); }
+.bg-vp { background: rgba(255,107,107,0.15); color: var(--vp); }
+.bg-hazardous { background: rgba(121,80,242,0.15); color: #7950f2; }
+
+/* TABS */
+.tab-content { display: none; }
+.tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+.guideline-tab { animation: fadeIn 0.3s ease; }
+
+/* AIR PURIFIER DIY */
+.diy-step {
+  display: flex; align-items: flex-start; gap: 16px;
+  padding: 16px; border-radius: 12px;
+  background: var(--card2); border: 1px solid var(--border); margin-bottom: 10px;
+}
+.diy-num {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; color: white; flex-shrink: 0;
+}
+.diy-text h5 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+.diy-text p { font-size: 13px; color: var(--text2); }
+</style>
+</head>
+<body>
+
+<!-- PARTICLES -->
+<div class="particles" id="particles"></div>
+
+<!-- AUTH SCREEN -->
+<div id="auth-screen">
+  <div class="auth-container">
+    <div class="auth-logo">AirSense</div>
+    <div class="auth-subtitle">Mumbai AQI Intelligence Platform</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchAuthTab('login')">Sign In</button>
+      <button class="auth-tab" onclick="switchAuthTab('signup')">Sign Up</button>
+    </div>
+
+    <div id="login-form">
+      <div class="auth-field">
+        <label>Email Address</label>
+        <input type="email" id="login-email" placeholder="you@example.com"/>
+      </div>
+      <div class="auth-field">
+        <label>Password</label>
+        <input type="password" id="login-pass" placeholder="••••••••"/>
+      </div>
+      <div class="auth-error" id="login-error">Invalid email or password</div>
+      <button class="auth-btn" onclick="doLogin()">Sign In</button>
+      <div style="display:flex;align-items:center;gap:10px;margin-top:16px;">
+        <div style="flex:1;height:1px;background:rgba(99,120,255,0.15);"></div>
+        <span style="font-size:12px;color:#555f8a;">or try a demo</span>
+        <div style="flex:1;height:1px;background:rgba(99,120,255,0.15);"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;">
+        <button onclick="demoLogin('kid')"   style="padding:10px 6px;border-radius:10px;border:1.5px solid rgba(255,107,53,0.4);background:rgba(255,107,53,0.08);color:#ff6b35;font-family:var(--font-body);font-size:12px;font-weight:600;cursor:pointer;">Explorer (10–16)</button>
+        <button onclick="demoLogin('youth')" style="padding:10px 6px;border-radius:10px;border:1.5px solid rgba(99,120,255,0.4);background:rgba(99,120,255,0.08);color:#7b8fff;font-family:var(--font-body);font-size:12px;font-weight:600;cursor:pointer;">Youth (17–34)</button>
+        <button onclick="demoLogin('adult')" style="padding:10px 6px;border-radius:10px;border:1.5px solid rgba(63,94,251,0.4);background:rgba(63,94,251,0.08);color:#3f5efb;font-family:var(--font-body);font-size:12px;font-weight:600;cursor:pointer;">Adult (35–55)</button>
+        <button onclick="demoLogin('senior')" style="padding:10px 6px;border-radius:10px;border:1.5px solid rgba(0,82,204,0.4);background:rgba(0,82,204,0.08);color:#0052cc;font-family:var(--font-body);font-size:12px;font-weight:600;cursor:pointer;">Senior (56+)</button>
+      </div>
+    </div>
+
+    <div id="signup-form" style="display:none">
+      <div class="auth-field">
+        <label>Email Address</label>
+        <input type="email" id="signup-email" placeholder="you@example.com"/>
+      </div>
+      <div class="auth-field">
+        <label>Password</label>
+        <input type="password" id="signup-pass" placeholder="Create password"/>
+      </div>
+      <div class="auth-field">
+        <label>Select Your Age Group</label>
+        <div class="age-group-grid">
+          <div class="age-option" onclick="selectAge('kid')" id="age-kid">
+            <div class="age-label">10–16 Years</div>
+            <div class="age-desc">Explorer Mode</div>
+          </div>
+          <div class="age-option" onclick="selectAge('youth')" id="age-youth">
+            <div class="age-label">17–34 Years</div>
+            <div class="age-desc">Youth Mode</div>
+          </div>
+          <div class="age-option" onclick="selectAge('adult')" id="age-adult">
+            <div class="age-label">35–55 Years</div>
+            <div class="age-desc">Professional</div>
+          </div>
+          <div class="age-option" onclick="selectAge('senior')" id="age-senior">
+            <div class="age-label">56+ Years</div>
+            <div class="age-desc">Comfort Mode</div>
+          </div>
+        </div>
+      </div>
+      <div class="auth-error" id="signup-error">Please fill all fields</div>
+      <button class="auth-btn" onclick="doSignup()">Create Account</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-brand">AirSense</div>
+    <div class="nav-links" id="nav-links">
+      <button class="nav-link active" onclick="showPage('home')">Home</button>
+      <button class="nav-link" onclick="showPage('prediction')">Predictions</button>
+      <button class="nav-link" onclick="showPage('indoor')">Indoor AQI</button>
+      <button class="nav-link" onclick="showPage('location')">Mumbai Map</button>
+      <button class="nav-link" onclick="showPage('news')">News</button>
+      <button class="nav-link" onclick="showPage('team')">Our Team</button>
+    </div>
+    <div class="nav-right">
+      <div class="nav-aqi-badge" id="nav-aqi-badge" style="background:rgba(255,146,43,0.15);color:#ff922b;">AQI 158</div>
+      <div class="theme-badge" id="theme-badge">YOUTH</div>
+      <div class="nav-user" id="nav-user" onclick="doLogout()">U</div>
+      <button class="nav-hamburger" id="hamburger" onclick="toggleMobileNav()" aria-label="Menu">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+    </div>
+  </nav>
+  <!-- MOBILE DRAWER -->
+  <div class="mobile-nav-drawer" id="mobile-drawer">
+    <button class="nav-link" onclick="showPage('home');closeMobileNav()">Home</button>
+    <button class="nav-link" onclick="showPage('prediction');closeMobileNav()">Predictions</button>
+    <button class="nav-link" onclick="showPage('indoor');closeMobileNav()">Indoor AQI</button>
+    <button class="nav-link" onclick="showPage('location');closeMobileNav()">Mumbai Map</button>
+    <button class="nav-link" onclick="showPage('news');closeMobileNav()">News</button>
+    <button class="nav-link" onclick="showPage('team');closeMobileNav()">Our Team</button>
+    <div style="border-top:1px solid var(--border);margin-top:8px;padding-top:10px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+      <span style="font-size:13px;color:var(--text2);">Signed in as <strong id="mobile-email-label" style="color:var(--text)"></strong></span>
+      <button onclick="doLogout()" style="background:rgba(255,107,107,0.15);border:1px solid rgba(255,107,107,0.3);color:#ff6b6b;padding:6px 12px;border-radius:8px;font-size:12px;cursor:pointer;font-family:var(--font-body);">Sign Out</button>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+
+    <!-- HOME PAGE -->
+    <div class="page active" id="page-home">
+      <div class="container">
+        <div id="kid-welcome" style="display:none; background:linear-gradient(135deg,#ff6b35,#ffd43b); padding:16px 20px; border-radius:16px; margin-bottom:20px; color:white;">
+          <div style="font-size:22px; font-weight:800; font-family:Syne,sans-serif;">Hey Explorer! Ready to check the air?</div>
+          <div style="font-size:14px; opacity:0.9; margin-top:4px;">Earn badges by learning about AQI today!</div>
+        </div>
+        <div id="senior-welcome" style="display:none;">
+          <div style="font-size:28px; font-weight:700; font-family:Syne,sans-serif; color:var(--text); margin-bottom:8px;">Good Morning! Stay Safe Today.</div>
+          <button class="voice-btn" onclick="readAloud()">Read Page Aloud</button>
+        </div>
+
+        <!-- HEALTH ALERT -->
+        <div id="health-alert-banner" class="health-alert warning" style="margin-bottom:20px;">
+          <div class="alert-icon" style="font-size:16px;font-weight:700;color:#ffd43b;">!</div>
+          <div class="alert-text">
+            <h4>Moderate Air Quality</h4>
+            <p id="alert-text-content">People with respiratory issues should limit outdoor exposure. Wear N95 masks if going out.</p>
+          </div>
+        </div>
+
+        <div class="grid-2" style="gap:24px; margin-bottom:24px;">
+          <!-- AQI HERO -->
+          <div class="aqi-hero" id="aqi-hero">
+            <div style="font-size:13px; color:var(--text3); font-family:var(--font-mono); margin-bottom:8px;">CURRENT AQI — MUMBAI</div>
+            <div class="aqi-value-big" id="aqi-display" style="color:#ff922b;">158</div>
+            <div class="aqi-label" id="aqi-cat-label" style="color:#ff922b;">Unhealthy for Sensitive Groups</div>
+            <div class="aqi-bar-wrap">
+              <div class="aqi-bar">
+                <div class="aqi-needle" id="aqi-needle" style="left:40%;"></div>
+              </div>
+              <div class="aqi-legend">
+                <span>0</span><span>50</span><span>100</span><span>150</span><span>200</span><span>300</span><span>500</span>
+              </div>
+            </div>
+            <div class="aqi-meta">
+              <div class="aqi-meta-item">
+                <div class="aqi-meta-val" style="color:var(--good);">38</div>
+                <div class="aqi-meta-key">Min (Week)</div>
+              </div>
+              <div class="aqi-meta-item">
+                <div class="aqi-meta-val" style="color:var(--vp);">342</div>
+                <div class="aqi-meta-key">Max (Week)</div>
+              </div>
+              <div class="aqi-meta-item">
+                <div class="aqi-meta-val">162</div>
+                <div class="aqi-meta-key">7-Day Avg</div>
+              </div>
+            </div>
+            <div class="accuracy-badge">Model Accuracy ±19.1 AQI</div>
+            <div class="last-updated" id="last-updated">Last updated: just now</div>
+          </div>
+
+          <!-- TODAY TREND -->
+          <div class="card">
+            <div class="card-title">Today's Hourly AQI Trend</div>
+            <div class="chart-wrap"><canvas id="hourlyChart"></canvas></div>
+          </div>
+        </div>
+
+        <!-- STATS ROW -->
+        <div class="grid-4" style="margin-bottom:24px;">
+          <div class="stat-card">
+            <div class="stat-icon" style="font-size:18px;font-weight:700;color:var(--accent);">AQI</div>
+            <div class="stat-val aqi-poor" id="curr-aqi-stat">158</div>
+            <div class="stat-label">Current AQI</div>
+            <div class="stat-trend trend-up">↑ 3 from yesterday</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🔮</div>
+            <div class="stat-val" id="pred-aqi-stat">143</div>
+            <div class="stat-label">Predicted (Tomorrow)</div>
+            <div class="stat-trend trend-down">↓ 15 expected</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">💨</div>
+            <div class="stat-val aqi-moderate">PM2.5</div>
+            <div class="stat-label">Primary Pollutant</div>
+            <div class="stat-trend" style="color:var(--text3);">62 μg/m³</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">👁️</div>
+            <div class="stat-val" style="color:var(--good);">4.2km</div>
+            <div class="stat-label">Visibility</div>
+            <div class="stat-trend" style="color:var(--text3);">Reduced</div>
+          </div>
+        </div>
+
+        <!-- WEEKLY FORECAST -->
+        <div class="card" style="margin-bottom:24px;">
+          <div class="card-title">Weekly AQI Forecast</div>
+          <div class="week-forecast" id="week-forecast"></div>
+        </div>
+
+        <!-- SKINCARE MODULE (age-based) -->
+        <div id="skincare-module">
+          <div class="section-title">Skin Safety Today</div>
+          <div class="grid-2">
+            <div class="skincare-meter">
+              <div style="font-size:13px;color:var(--text3);margin-bottom:4px;">DAILY SKIN SAFETY INDEX</div>
+              <div class="skin-ssi" id="skin-ssi">42</div>
+              <div style="font-size:12px;color:var(--text3);text-align:center;margin-bottom:4px;">out of 100</div>
+              <div class="skin-risk-bar">
+                <div class="skin-needle" id="skin-needle" style="left:58%;"></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);">
+                <span>Low</span><span>Moderate</span><span>High</span>
+              </div>
+              <div style="margin-top:12px;text-align:center;">
+                <span id="skin-risk-badge" style="padding:6px 16px;border-radius:20px;font-size:13px;font-weight:700;background:rgba(255,146,43,0.15);color:#ff922b;">Moderate Risk</span>
+              </div>
+            </div>
+            <div>
+              <div id="skincare-tips"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- KID GAMIFICATION -->
+        <div id="kid-badges" style="display:none; margin-top:24px;">
+          <div class="section-title">Your Air Badges</div>
+          <div class="badge-container">
+            <div class="badge">Nature Protector</div>
+            <div class="badge">AQI Explorer</div>
+            <div class="badge">Safety First</div>
+            <div class="badge">Water Lover</div>
+          </div>
+          <div class="kid-aqi-meter" style="margin-top:20px;">
+            <div class="kid-face" style="background:rgba(56,217,169,0.2);color:var(--good);">◉<div style="font-size:10px;margin-top:2px;">Good</div></div>
+            <div class="kid-face active" style="background:rgba(255,212,59,0.2);color:var(--moderate);">◎<div style="font-size:10px;margin-top:2px;">OK</div></div>
+            <div class="kid-face" style="background:rgba(255,146,43,0.2);color:var(--poor);">M<div style="font-size:10px;margin-top:2px;">Mask!</div></div>
+            <div class="kid-face" style="background:rgba(255,107,107,0.2);color:var(--vp);">⌂<div style="font-size:10px;margin-top:2px;">Stay In</div></div>
+          </div>
+          <div style="margin-top:12px;">
+            <div style="font-size:13px;color:var(--text2);margin-bottom:6px;">Today's Air Quality Level:</div>
+            <div class="progress-bar-kid">
+              <div class="progress-fill" style="width:42%;"></div>
+            </div>
+            <div style="font-size:12px;color:var(--text3);">You're safe to go outside briefly — wear a mask! M</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- PREDICTION PAGE -->
+    <div class="page" id="page-prediction">
+      <div class="container">
+        <div class="page-title">Prediction Model</div>
+        <div class="page-sub">CNN-LSTM model predictions — actual vs predicted AQI analysis</div>
+
+        <div class="filter-tabs" id="filter-tabs">
+          <button class="filter-tab active" onclick="setFilter('week')">Week</button>
+          <button class="filter-tab" onclick="setFilter('month')">Month</button>
+          <button class="filter-tab" onclick="setFilter('all')">All Data</button>
+        </div>
+
+        <!-- MODEL ACCURACY BANNER -->
+        <div style="display:flex;gap:16px;margin-bottom:24px;flex-wrap:wrap;">
+          <div class="card" style="flex:1;min-width:140px;">
+            <div class="card-title">Model MAE</div>
+            <div class="card-value" style="color:var(--accent);">36.62</div>
+            <div class="card-sub">AQI units avg error</div>
+          </div>
+          <div class="card" style="flex:1;min-width:140px;">
+            <div class="card-title">Model Error Range</div>
+            <div class="card-value" style="color:var(--good);">±19.1</div>
+            <div class="card-sub">As reported in notebook</div>
+          </div>
+          <div class="card" style="flex:1;min-width:140px;">
+            <div class="card-title">MAPE</div>
+            <div class="card-value">26.42%</div>
+            <div class="card-sub">Mean abs % error</div>
+          </div>
+          <div class="card" style="flex:1;min-width:140px;">
+            <div class="card-title">Architecture</div>
+            <div class="card-value" style="font-size:20px;">CNN-LSTM</div>
+            <div class="card-sub">ResNet18 + LSTM (7-day window)</div>
+          </div>
+        </div>
+
+        <!-- AQI TREND CHART -->
+        <div class="card" style="margin-bottom:24px;">
+          <div class="card-title">Actual AQI vs Predicted AQI</div>
+          <div class="chart-wrap-tall"><canvas id="trendChart"></canvas></div>
+        </div>
+
+        <!-- WEEKLY PREDICTION + AQI CATEGORIES -->
+        <div class="grid-2" style="margin-bottom:24px;">
+          <div class="card">
+            <div class="card-title">7-Day AQI Forecast</div>
+            <div class="chart-wrap"><canvas id="weekPredChart"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-title">AQI Category Distribution</div>
+            <div class="chart-wrap"><canvas id="categoryChart"></canvas></div>
+          </div>
+        </div>
+
+        <!-- PREDICTION TABLE -->
+        <div class="card">
+          <div class="card-title">Validation Dataset (Actual vs Predicted)</div>
+          <div style="overflow-x:auto;">
+            <table style="width:100%;border-collapse:collapse;font-size:13px;" id="pred-table">
+              <thead>
+                <tr style="border-bottom:1px solid var(--border);">
+                  <th style="padding:10px;text-align:left;color:var(--text3);">Date</th>
+                  <th style="padding:10px;text-align:right;color:var(--text3);">Actual AQI</th>
+                  <th style="padding:10px;text-align:right;color:var(--text3);">Predicted AQI</th>
+                  <th style="padding:10px;text-align:right;color:var(--text3);">Error</th>
+                  <th style="padding:10px;text-align:center;color:var(--text3);">Category</th>
+                </tr>
+              </thead>
+              <tbody id="pred-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INDOOR AQI PAGE -->
+    <div class="page" id="page-indoor">
+      <div class="container">
+        <div class="page-title">Indoor AQI Management</div>
+        <div class="page-sub">Improve your indoor air quality with plants, purifiers, and smart habits</div>
+
+        <div class="grid-2" style="margin-bottom:24px;">
+          <!-- PLANT CALCULATOR -->
+          <div class="card">
+            <div class="card-title">Plant Recommendation Engine</div>
+            <div class="plant-form">
+              <div class="form-row">
+                <div class="form-field">
+                  <label>Room Size (sq ft)</label>
+                  <input type="number" id="room-size" placeholder="e.g. 200" value="200"/>
+                </div>
+                <div class="form-field">
+                  <label>Number of Occupants</label>
+                  <input type="number" id="occupants" placeholder="e.g. 4" value="4"/>
+                </div>
+              </div>
+              <button class="calc-btn" onclick="calcPlants()">Calculate Plants Needed</button>
+            </div>
+            <div class="plant-results" id="plant-results" style="margin-top:20px;">
+              <div style="padding:16px;background:rgba(56,217,169,0.1);border:1px solid rgba(56,217,169,0.3);border-radius:12px;margin-bottom:16px;">
+                <div style="font-size:13px;color:var(--text3);">RECOMMENDED PLANTS</div>
+                <div style="font-family:var(--font-mono);font-size:36px;font-weight:700;color:var(--good);" id="plant-count">0</div>
+                <div style="font-size:13px;color:var(--text2);" id="plant-calc-detail">Calculating...</div>
+              </div>
+              <div id="plant-list"></div>
+            </div>
+          </div>
+
+          <!-- HEALTH RISKS -->
+          <div class="card">
+            <div class="card-title">Health Risks of Poor Indoor Air</div>
+            <div class="skincare-tip">
+              <div class="skincare-tip-icon" style="font-size:14px;font-weight:700;color:var(--poor);">Lung</div>
+              <div class="skincare-tip-text"><strong>Respiratory Issues:</strong> High PM2.5 indoors can cause asthma, bronchitis, and reduced lung function over time.</div>
+            </div>
+            <div class="skincare-tip">
+              <div class="skincare-tip-icon" style="font-size:14px;font-weight:700;color:var(--accent);">Mind</div>
+              <div class="skincare-tip-text"><strong>Cognitive Decline:</strong> Studies show poor air quality reduces concentration, memory, and cognitive performance.</div>
+            </div>
+            <div class="skincare-tip">
+              <div class="skincare-tip-icon" style="font-size:14px;font-weight:700;color:var(--vp);">Heart</div>
+              <div class="skincare-tip-text"><strong>Cardiovascular Stress:</strong> Long-term exposure increases risk of heart disease and stroke by 20-30%.</div>
+            </div>
+            <div class="skincare-tip">
+              <div class="skincare-tip-icon">😴</div>
+              <div class="skincare-tip-text"><strong>Sleep Disruption:</strong> VOCs and CO₂ buildup during sleep affects sleep quality and morning alertness.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DIY AIR PURIFIER + TREATMENTS -->
+        <div class="grid-2" style="margin-bottom:24px;">
+          <div class="card">
+            <div class="card-title">🔧 DIY Air Purifier at Home</div>
+            <div class="diy-step">
+              <div class="diy-num">1</div>
+              <div class="diy-text">
+                <h5>Get a Box Fan (20-inch works best)</h5>
+                <p>A standard household box fan, available for ₹800-1500 at any electronics store.</p>
+              </div>
+            </div>
+            <div class="diy-step">
+              <div class="diy-num">2</div>
+              <div class="diy-text">
+                <h5>Attach MERV-13 Filter</h5>
+                <p>Secure a 20"x20"x1" MERV-13 furnace filter to the back of the fan with tape. Cost: ₹600-1200.</p>
+              </div>
+            </div>
+            <div class="diy-step">
+              <div class="diy-num">3</div>
+              <div class="diy-text">
+                <h5>Run Continuously in Occupied Room</h5>
+                <p>Place in the center of room. Can reduce PM2.5 by 70-90%. Replace filter monthly.</p>
+              </div>
+            </div>
+            <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;">
+              <a href="https://www.amazon.in/s?k=air+purifier+hepa+cheap" target="_blank" class="plant-buy-link" style="display:inline-block;">🛒 Buy Air Purifier</a>
+              <a href="https://youtu.be/P_bjJrc8aK4" target="_blank" class="plant-buy-link" style="display:inline-block;background:rgba(255,0,0,0.08);border-color:rgba(255,0,0,0.4);color:#ff4444;">▶️ DIY Tutorial on YouTube</a>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">💊 Treatments & Remedies</div>
+            <div class="skincare-tip">
+              <div class="skincare-tip-icon" style="font-size:14px;font-weight:700;color:var(--good);">Plant</div>
+              <div class="skincare-tip-text"><strong>Ayurvedic:</strong> Tulsi tea daily, Triphala churna, steam inhalation with eucalyptus oil, Chyawanprash for immunity building.</div>
+            </div>
+            <div class="skincare-tip">
+              <div class="skincare-tip-icon">💊</div>
+              <div class="skincare-tip-text"><strong>Pharmacy:</strong> Levocetrizine for allergies (₹30-80), Budecort inhaler for asthma (₹150-300), N95 masks (₹50-200 each).</div>
+            </div>
+            <div class="skincare-tip">
+              <div class="skincare-tip-icon" style="font-size:14px;font-weight:700;color:var(--accent2);">Med</div>
+              <div class="skincare-tip-text"><strong>See a Doctor If:</strong> Persistent cough >2 weeks, chest tightness, difficulty breathing, wheezing sounds, or blood in mucus.</div>
+            </div>
+            <div class="skincare-tip">
+              <div class="skincare-tip-icon" style="font-size:14px;font-weight:700;color:var(--text2);">Home</div>
+              <div class="skincare-tip-text"><strong>Home Care:</strong> Keep windows closed 8AM-12PM (peak pollution), vacuum with HEPA filter, use exhaust fans while cooking.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOCATION / MUMBAI MAP PAGE -->
+    <div class="page" id="page-location">
+      <div class="container">
+        <div class="page-title">Mumbai AQI Map</div>
+        <div class="page-sub">Click any area on the map to see its AQI data</div>
+
+        <div class="grid-2" style="gap:20px;align-items:start;">
+          <!-- SVG MAP -->
+          <div class="card" style="padding:16px;">
+            <div class="card-title">MUMBAI GEOGRAPHICAL MAP — CLICK AN AREA</div>
+            <div style="position:relative;width:100%;background:#0d1b2e;border-radius:12px;overflow:hidden;">
+              <svg id="mumbai-svg" viewBox="0 0 500 680" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;">
+
+                <!-- Ocean / water background -->
+                <defs>
+                  <linearGradient id="seaGrad" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#0d1b2e"/>
+                    <stop offset="100%" stop-color="#112240"/>
+                  </linearGradient>
+                  <filter id="glow">
+                    <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                    <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                  </filter>
+                </defs>
+                <rect width="500" height="680" fill="url(#seaGrad)"/>
+
+                <!-- Subtle water ripple lines -->
+                <line x1="0" y1="100" x2="500" y2="100" stroke="rgba(99,120,255,0.05)" stroke-width="1"/>
+                <line x1="0" y1="200" x2="500" y2="200" stroke="rgba(99,120,255,0.05)" stroke-width="1"/>
+                <line x1="0" y1="300" x2="500" y2="300" stroke="rgba(99,120,255,0.05)" stroke-width="1"/>
+                <line x1="0" y1="400" x2="500" y2="400" stroke="rgba(99,120,255,0.05)" stroke-width="1"/>
+                <line x1="0" y1="500" x2="500" y2="500" stroke="rgba(99,120,255,0.05)" stroke-width="1"/>
+
+                <!-- ============================================================
+                     MUMBAI PENINSULA — geographical outline (roughly accurate)
+                     The island city runs N-S, narrow at south, wider at north
+                     ============================================================ -->
+
+                <!-- Main Mumbai peninsula land mass -->
+                <path d="
+                  M 200,30
+                  L 215,28 L 232,30 L 248,35 L 260,44 L 268,56
+                  L 272,72 L 270,90 L 265,108
+                  L 260,128 L 258,148 L 255,165
+                  L 250,180 L 248,195 L 246,215
+                  L 244,232 L 242,248 L 240,260
+                  L 236,278 L 232,295 L 228,312
+                  L 222,330 L 215,350 L 208,370
+                  L 200,392 L 192,412 L 184,432
+                  L 175,452 L 164,472 L 152,488
+                  L 140,500 L 128,508 L 118,510
+                  L 110,506 L 105,496 L 103,482
+                  L 105,468 L 110,454 L 116,442
+                  L 120,428 L 122,414 L 124,400
+                  L 125,385 L 124,370 L 122,356
+                  L 118,340 L 114,325 L 110,310
+                  L 107,294 L 105,278 L 104,262
+                  L 103,246 L 103,230 L 104,214
+                  L 106,198 L 108,182 L 110,166
+                  L 112,148 L 113,132 L 113,116
+                  L 112,100 L 110,84 L 108,68
+                  L 108,54 L 112,42 L 120,33
+                  L 132,28 L 148,26 L 165,26
+                  L 182,27 Z
+                " fill="#1e3d5c" stroke="rgba(99,120,255,0.5)" stroke-width="1.5" stroke-linejoin="round"/>
+
+                <!-- Salsette Island (North Mumbai — Borivali/Malad/Andheri belt) -->
+                <path d="
+                  M 190,26
+                  L 210,20 L 235,16 L 262,18 L 288,24
+                  L 312,34 L 330,48 L 342,64
+                  L 348,82 L 346,100 L 338,116
+                  L 326,128 L 310,136 L 292,140
+                  L 272,142 L 252,140 L 234,136
+                  L 218,130 L 205,122 L 196,112
+                  L 190,100 L 188,86 L 188,70
+                  L 190,54 L 192,40 Z
+                " fill="#1e3d5c" stroke="rgba(99,120,255,0.5)" stroke-width="1.5" stroke-linejoin="round"/>
+
+                <!-- Thane (east, connected via creek) -->
+                <path d="
+                  M 340,50
+                  L 370,38 L 400,32 L 428,36
+                  L 450,46 L 462,60 L 464,78
+                  L 460,96 L 450,112 L 434,124
+                  L 414,132 L 392,134 L 370,130
+                  L 350,120 L 336,106 L 330,90
+                  L 330,74 L 334,60 Z
+                " fill="#1e3d5c" stroke="rgba(99,120,255,0.5)" stroke-width="1.5" stroke-linejoin="round"/>
+
+                <!-- Navi Mumbai (south-east across the harbour) -->
+                <path d="
+                  M 340,240
+                  L 368,228 L 398,224 L 426,228
+                  L 448,240 L 460,258 L 462,278
+                  L 456,298 L 442,314 L 422,324
+                  L 398,328 L 374,326 L 352,316
+                  L 336,300 L 328,280 L 328,260 Z
+                " fill="#1e3d5c" stroke="rgba(99,120,255,0.5)" stroke-width="1.5" stroke-linejoin="round"/>
+
+                <!-- Thane Creek (water body between Mumbai & Navi Mumbai) -->
+                <path d="M 300,140 Q 320,190 316,240 Q 314,260 320,280 Q 326,300 332,316"
+                  fill="none" stroke="rgba(30,100,180,0.4)" stroke-width="8" stroke-linecap="round"/>
+
+                <!-- Mumbai Harbour (east side water) -->
+                <path d="M 135,510 Q 180,560 220,580 Q 270,600 320,580"
+                  fill="none" stroke="rgba(30,100,180,0.3)" stroke-width="6" stroke-linecap="round"/>
+
+                <!-- ============================================================
+                     CLICKABLE AREA ZONES — overlaid on geographic shapes
+                     ============================================================ -->
+
+                <!-- BORIVALI - far north -->
+                <ellipse id="zone-8"" class="map-zone" cx="218" cy="40" rx="42" ry="22" fill="rgba(255,146,43,0.45)" stroke="#ff922b" stroke-width="1.5" onclick="selectArea(8)" style="cursor:pointer;transition:all 0.2s;"/>
+                <text x="218" y="36" text-anchor="middle" fill="white" font-size="9" font-weight="600" pointer-events="none">Borivali</text>
+                <text x="218" y="47" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="8" pointer-events="none">175</text>
+
+                <!-- MALAD -->
+                <ellipse id="zone-12"" class="map-zone" cx="148" cy="80" rx="30" ry="18" fill="rgba(255,146,43,0.45)" stroke="#ff922b" stroke-width="1.5" onclick="selectArea(12)" style="cursor:pointer;"/>
+                <text x="148" y="76" text-anchor="middle" fill="white" font-size="9" font-weight="600" pointer-events="none">Malad</text>
+                <text x="148" y="86" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="8" pointer-events="none">162</text>
+
+                <!-- GOREGAON -->
+                <ellipse id="zone-13"" class="map-zone" cx="200" cy="88" rx="30" ry="18" fill="rgba(255,146,43,0.45)" stroke="#ff922b" stroke-width="1.5" onclick="selectArea(13)" style="cursor:pointer;"/>
+                <text x="200" y="84" text-anchor="middle" fill="white" font-size="9" font-weight="600" pointer-events="none">Goregaon</text>
+                <text x="200" y="95" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="8" pointer-events="none">148</text>
+
+                <!-- ANDHERI -->
+                <ellipse id="zone-1"" class="map-zone" cx="162" cy="136" rx="35" ry="20" fill="rgba(255,146,43,0.5)" stroke="#ff922b" stroke-width="1.5" onclick="selectArea(1)" style="cursor:pointer;"/>
+                <text x="162" y="132" text-anchor="middle" fill="white" font-size="9" font-weight="600" pointer-events="none">Andheri</text>
+                <text x="162" y="143" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="8" pointer-events="none">168</text>
+
+                <!-- JUHU (west coast) -->
+                <ellipse id="zone-9"" class="map-zone" cx="116" cy="148" rx="22" ry="16" fill="rgba(255,146,43,0.45)" stroke="#ff922b" stroke-width="1.5" onclick="selectArea(9)" style="cursor:pointer;"/>
+                <text x="116" y="144" text-anchor="middle" fill="white" font-size="8" font-weight="600" pointer-events="none">Juhu</text>
+                <text x="116" y="154" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="7" pointer-events="none">135</text>
+
+                <!-- POWAI (east, near lake) -->
+                <ellipse id="zone-5"" class="map-zone" cx="258" cy="110" rx="30" ry="18" fill="rgba(255,146,43,0.45)" stroke="#ff922b" stroke-width="1.5" onclick="selectArea(5)" style="cursor:pointer;"/>
+                <text x="258" y="106" text-anchor="middle" fill="white" font-size="9" font-weight="600" pointer-events="none">Powai</text>
+                <text x="258" y="117" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="8" pointer-events="none">155</text>
+
+                <!-- MULUND (north-east) -->
+                <ellipse id="zone-17"" class="map-zone" cx="288" cy="72" rx="26" ry="16" fill="rgba(255,146,43,0.45)" stroke="#ff922b" stroke-width="1.5" onclick="selectArea(17)" style="cursor:pointer;"/>
+                <text x="288" y="68" text-anchor="middle" fill="white" font-size="8" font-weight="600" pointer-events="none">Mulund</text>
+                <text x="288" y="78" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="7" pointer-events="none">158</text>
+
+                <!-- VIKHROLI -->
+                <ellipse id="zone-16"" class="map-zone" cx="264" cy="152" rx="26" ry="16" fill="rgba(255,146,43,0.5)" stroke="#ff922b" stroke-width="1.5" onclick="selectArea(16)" style="cursor:pointer;"/>
+                <text x="264" y="148" text-anchor="middle" fill="white" font-size="8" font-weight="600" pointer-events="none">Vikhroli</text>
+                <text x="264" y="158" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="7" pointer-events="none">182</text>
+
+                <!-- KURLA -->
+                <ellipse id="zone-2"" class="map-zone" cx="228" cy="192" rx="30" ry="18" fill="rgba(255,107,107,0.55)" stroke="#ff6b6b" stroke-width="1.5" onclick="selectArea(2)" style="cursor:pointer;"/>
+                <text x="228" y="188" text-anchor="middle" fill="white" font-size="9" font-weight="600" pointer-events="none">Kurla</text>
+                <text x="228" y="199" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="8" pointer-events="none">195</text>
+
+                <!-- BANDRA -->
+                <ellipse id="zone-0"" class="map-zone" cx="148" cy="196" rx="30" ry="18" fill="rgba(255,146,43,0.5)" stroke="#ff922b" stroke-width="1.5" onclick="selectArea(0)" style="cursor:pointer;"/>
+                <text x="148" y="192" text-anchor="middle" fill="white" font-size="9" font-weight="600" pointer-events="none">Bandra</text>
+                <text x="148" y="203" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="8" pointer-events="none">142</text>
+
+                <!-- CHEMBUR -->
+                <ellipse id="zone-11"" class="map-zone" cx="250" cy="238" rx="28" ry="17" fill="rgba(255,146,43,0.55)" stroke="#ff922b" stroke-width="1.5" onclick="selectArea(11)" style="cursor:pointer;"/>
+                <text x="250" y="234" text-anchor="middle" fill="white" font-size="8" font-weight="600" pointer-events="none">Chembur</text>
+                <text x="250" y="244" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="7" pointer-events="none">188</text>
+
+                <!-- DADAR -->
+                <ellipse id="zone-14"" class="map-zone" cx="170" cy="244" rx="28" ry="17" fill="rgba(255,146,43,0.5)" stroke="#ff922b" stroke-width="1.5" onclick="selectArea(14)" style="cursor:pointer;"/>
+                <text x="170" y="240" text-anchor="middle" fill="white" font-size="9" font-weight="600" pointer-events="none">Dadar</text>
+                <text x="170" y="251" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="8" pointer-events="none">172</text>
+
+                <!-- DHARAVI -->
+                <ellipse id="zone-10"" class="map-zone" cx="200" cy="278" rx="26" ry="16" fill="rgba(201,42,42,0.65)" stroke="#c92a2a" stroke-width="1.5" onclick="selectArea(10)" style="cursor:pointer;"/>
+                <text x="200" y="274" text-anchor="middle" fill="white" font-size="8" font-weight="600" pointer-events="none">Dharavi</text>
+                <text x="200" y="284" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="7" pointer-events="none">225</text>
+
+                <!-- WORLI -->
+                <ellipse id="zone-3"" class="map-zone" cx="142" cy="300" rx="26" ry="16" fill="rgba(255,212,59,0.55)" stroke="#ffd43b" stroke-width="1.5" onclick="selectArea(3)" style="cursor:pointer;"/>
+                <text x="142" y="296" text-anchor="middle" fill="white" font-size="9" font-weight="600" pointer-events="none">Worli</text>
+                <text x="142" y="307" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="8" pointer-events="none">128</text>
+
+                <!-- LOWER PAREL -->
+                <ellipse id="zone-15"" class="map-zone" cx="152" cy="342" rx="26" ry="16" fill="rgba(255,146,43,0.5)" stroke="#ff922b" stroke-width="1.5" onclick="selectArea(15)" style="cursor:pointer;"/>
+                <text x="152" y="337" text-anchor="middle" fill="white" font-size="8" font-weight="600" pointer-events="none">Lower Parel</text>
+                <text x="152" y="348" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="7" pointer-events="none">145</text>
+
+                <!-- COLABA (south tip) -->
+                <ellipse id="zone-4"" class="map-zone" cx="136" cy="472" rx="28" ry="18" fill="rgba(56,217,169,0.55)" stroke="#38d9a9" stroke-width="1.5" onclick="selectArea(4)" style="cursor:pointer;"/>
+                <text x="136" y="468" text-anchor="middle" fill="white" font-size="9" font-weight="600" pointer-events="none">Colaba</text>
+                <text x="136" y="479" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="8" pointer-events="none">98</text>
+
+                <!-- THANE -->
+                <ellipse id="zone-6"" class="map-zone" cx="400" cy="84" rx="46" ry="28" fill="rgba(255,107,107,0.5)" stroke="#ff6b6b" stroke-width="1.5" onclick="selectArea(6)" style="cursor:pointer;"/>
+                <text x="400" y="79" text-anchor="middle" fill="white" font-size="10" font-weight="600" pointer-events="none">Thane</text>
+                <text x="400" y="92" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="9" pointer-events="none">202</text>
+
+                <!-- NAVI MUMBAI -->
+                <ellipse id="zone-7"" class="map-zone" cx="394" cy="276" rx="44" ry="28" fill="rgba(56,217,169,0.5)" stroke="#38d9a9" stroke-width="1.5" onclick="selectArea(7)" style="cursor:pointer;"/>
+                <text x="394" y="270" text-anchor="middle" fill="white" font-size="9" font-weight="600" pointer-events="none">Navi Mumbai</text>
+                <text x="394" y="282" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="8" pointer-events="none">118</text>
+
+                <!-- Water labels -->
+                <text x="50" y="320" fill="rgba(99,150,255,0.35)" font-size="11" font-style="italic" transform="rotate(-45,50,320)">Arabian Sea</text>
+                <text x="340" y="200" fill="rgba(99,150,255,0.35)" font-size="10" font-style="italic" transform="rotate(-60,340,200)">Thane Creek</text>
+                <text x="200" y="600" fill="rgba(99,150,255,0.3)" font-size="10" font-style="italic">Mumbai Harbour</text>
+
+                <!-- Compass rose -->
+                <g transform="translate(458,620)">
+                  <circle r="18" fill="rgba(0,0,0,0.5)" stroke="rgba(99,120,255,0.4)" stroke-width="1"/>
+                  <polygon points="0,-12 3,0 0,4 -3,0" fill="rgba(255,107,107,0.9)"/>
+                  <polygon points="0,12 3,0 0,-4 -3,0" fill="rgba(255,255,255,0.4)"/>
+                  <text x="0" y="-14" text-anchor="middle" fill="rgba(255,107,107,0.9)" font-size="8" font-weight="800">N</text>
+                </g>
+
+                <!-- AQI Legend -->
+                <g transform="translate(8,590)">
+                  <rect width="160" height="82" rx="6" fill="rgba(0,0,0,0.6)" stroke="rgba(99,120,255,0.2)" stroke-width="1"/>
+                  <text x="80" y="14" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="8" font-weight="700">AQI LEGEND</text>
+                  <circle cx="14" cy="26" r="5" fill="rgba(56,217,169,0.8)"/><text x="24" y="30" fill="rgba(255,255,255,0.65)" font-size="8">Good (0–100)</text>
+                  <circle cx="14" cy="42" r="5" fill="rgba(255,212,59,0.8)"/><text x="24" y="46" fill="rgba(255,255,255,0.65)" font-size="8">Moderate (101–150)</text>
+                  <circle cx="14" cy="58" r="5" fill="rgba(255,146,43,0.8)"/><text x="24" y="62" fill="rgba(255,255,255,0.65)" font-size="8">Poor (151–200)</text>
+                  <circle cx="14" cy="72" r="5" fill="rgba(201,42,42,0.8)"/><text x="24" y="76" fill="rgba(255,255,255,0.65)" font-size="8">Hazardous (200+)</text>
+                </g>
+
+                <!-- Map title -->
+                <rect x="8" y="8" width="180" height="22" rx="5" fill="rgba(0,0,0,0.55)"/>
+                <text x="98" y="23" text-anchor="middle" fill="rgba(255,255,255,0.85)" font-size="10" font-weight="700">Mumbai Metropolitan Region</text>
+              </svg>
+            </div>
+          </div>
+
+          <!-- RIGHT PANEL -->
+          <div style="display:flex;flex-direction:column;gap:16px;">
+            <div class="card" id="area-detail-card">
+              <div class="card-title">SELECTED AREA</div>
+              <div style="text-align:center;padding:12px 0;">
+                <div style="font-size:16px;font-weight:700;" id="selected-area-name">← Click any area on the map</div>
+                <div class="aqi-value-big" id="selected-aqi" style="font-size:56px;margin:10px 0;color:var(--text3);">—</div>
+                <div id="selected-cat" style="font-size:15px;font-weight:600;"></div>
+                <div id="selected-health" style="font-size:13px;color:var(--text2);margin-top:8px;line-height:1.5;"></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-title">AREA AQI COMPARISON</div>
+              <div class="chart-wrap"><canvas id="areaChart"></canvas></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NEWS PAGE -->
+    <div class="page" id="page-news">
+      <div class="container">
+        <div class="page-title">News &amp; Health Guidelines</div>
+        <div class="page-sub">Latest AQI news, government advisories, and health safety guidelines</div>
+
+        <!-- GOVERNMENT GUIDELINES TABS -->
+        <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
+          <button class="filter-tab active" onclick="showGuidelineTab('news',this)">Latest News</button>
+          <button class="filter-tab" onclick="showGuidelineTab('cpcb',this)">CPCB Guidelines</button>
+          <button class="filter-tab" onclick="showGuidelineTab('who',this)">WHO Recommendations</button>
+          <button class="filter-tab" onclick="showGuidelineTab('health',this)">Health Effects</button>
+        </div>
+
+        <!-- NEWS TAB -->
+        <div id="tab-news" class="guideline-tab">
+          <div class="grid-2">
+            <div>
+              <div class="section-title">Latest AQI News</div>
+              <div id="news-container"></div>
+            </div>
+            <div>
+              <div class="section-title">Health Effects by Age Group</div>
+              <div id="health-effects-container"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CPCB TAB -->
+        <div id="tab-cpcb" class="guideline-tab" style="display:none;">
+          <div class="section-title">CPCB — Central Pollution Control Board Guidelines</div>
+          <p style="font-size:13px;color:var(--text2);margin-bottom:20px;">Official recommendations from India's apex body for pollution control and environmental standards.</p>
+          <div class="grid-2">
+            <div class="card" style="margin-bottom:16px;">
+              <div class="card-title">AQI CATEGORY ACTIONS (CPCB)</div>
+              <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px;">
+                <div style="display:flex;gap:12px;align-items:flex-start;padding:10px;border-radius:8px;background:rgba(56,217,169,0.08);border-left:3px solid #38d9a9;">
+                  <div style="min-width:80px;font-family:var(--font-mono);font-size:12px;font-weight:700;color:#38d9a9;">0–50 GOOD</div>
+                  <div style="font-size:13px;color:var(--text2);">No health impact. Ideal for outdoor activities for all groups.</div>
+                </div>
+                <div style="display:flex;gap:12px;align-items:flex-start;padding:10px;border-radius:8px;background:rgba(255,212,59,0.08);border-left:3px solid #ffd43b;">
+                  <div style="min-width:80px;font-family:var(--font-mono);font-size:12px;font-weight:700;color:#ffd43b;">51–100 MOD</div>
+                  <div style="font-size:13px;color:var(--text2);">Minor breathing discomfort to sensitive people. Prolonged outdoor exertion should be limited for sensitive groups.</div>
+                </div>
+                <div style="display:flex;gap:12px;align-items:flex-start;padding:10px;border-radius:8px;background:rgba(255,146,43,0.08);border-left:3px solid #ff922b;">
+                  <div style="min-width:80px;font-family:var(--font-mono);font-size:12px;font-weight:700;color:#ff922b;">101–200 POOR</div>
+                  <div style="font-size:13px;color:var(--text2);">Breathing discomfort to most people on prolonged exposure. People with heart/lung disease, children, elderly should avoid outdoor exertion.</div>
+                </div>
+                <div style="display:flex;gap:12px;align-items:flex-start;padding:10px;border-radius:8px;background:rgba(255,107,107,0.08);border-left:3px solid #ff6b6b;">
+                  <div style="min-width:80px;font-family:var(--font-mono);font-size:12px;font-weight:700;color:#ff6b6b;">201–300 V.POOR</div>
+                  <div style="font-size:13px;color:var(--text2);">Respiratory illness on prolonged exposure. Avoid outdoor activities. Wear N95 mask if going out. Keep windows closed.</div>
+                </div>
+                <div style="display:flex;gap:12px;align-items:flex-start;padding:10px;border-radius:8px;background:rgba(201,42,42,0.08);border-left:3px solid #c92a2a;">
+                  <div style="min-width:80px;font-family:var(--font-mono);font-size:12px;font-weight:700;color:#c92a2a;">300+ HAZARD</div>
+                  <div style="font-size:13px;color:var(--text2);">Health alert — serious respiratory effects on everyone. Stay indoors with all windows closed. Use air purifiers with HEPA filters.</div>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:16px;">
+              <div class="card">
+                <div class="card-title">CPCB EMISSION STANDARDS</div>
+                <div class="skincare-tip"><div class="skincare-tip-icon" style="font-size:16px;font-weight:700;color:var(--accent);">PM</div><div class="skincare-tip-text"><strong>PM2.5 Annual Standard:</strong> 40 μg/m³ (24-hr average: 60 μg/m³). India's NAAQS standard for fine particulate matter.</div></div>
+                <div class="skincare-tip"><div class="skincare-tip-icon" style="font-size:16px;font-weight:700;color:var(--accent);">NO₂</div><div class="skincare-tip-text"><strong>NO₂ Annual Standard:</strong> 40 μg/m³. Primarily from vehicle exhaust and industrial combustion.</div></div>
+                <div class="skincare-tip"><div class="skincare-tip-icon" style="font-size:16px;font-weight:700;color:var(--accent);">O₃</div><div class="skincare-tip-text"><strong>Ozone 8-hr Standard:</strong> 100 μg/m³. Ground-level ozone worsens during hot, sunny conditions.</div></div>
+              </div>
+              <div class="card">
+                <div class="card-title">CPCB GRADED RESPONSE ACTION PLAN</div>
+                <div class="skincare-tip"><div class="skincare-tip-text"><strong>Stage 1 (AQI 201–300):</strong> Mechanical sweeping of roads, strict enforcement of dust norms at construction sites, ban on open waste burning.</div></div>
+                <div class="skincare-tip"><div class="skincare-tip-text"><strong>Stage 2 (AQI 301–400):</strong> Hot-mix plants and stone crushers shut, diesel generators restricted, heightened vehicle pollution checks.</div></div>
+                <div class="skincare-tip"><div class="skincare-tip-text"><strong>Stage 3 (AQI 401–450):</strong> Brick kilns and industries with inadequate controls closed, BS-III/IV diesel vehicles restricted in NCR zones.</div></div>
+                <div class="skincare-tip"><div class="skincare-tip-text"><strong>Stage 4 (AQI >450):</strong> Emergency measures — schools/colleges shift online, construction halted, additional transport restrictions imposed.</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- WHO TAB -->
+        <div id="tab-who" class="guideline-tab" style="display:none;">
+          <div class="section-title">WHO — World Health Organization Recommendations</div>
+          <p style="font-size:13px;color:var(--text2);margin-bottom:20px;">Global air quality guidelines updated in 2021, representing the most health-protective standards.</p>
+          <div class="grid-2">
+            <div class="card" style="margin-bottom:16px;">
+              <div class="card-title">WHO AIR QUALITY GUIDELINES (2021)</div>
+              <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px;">
+                <div style="padding:12px;border-radius:8px;background:var(--card2);border:1px solid var(--border);">
+                  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                    <strong style="font-size:14px;">PM2.5</strong>
+                    <span style="font-family:var(--font-mono);font-size:12px;color:var(--accent);">5 μg/m³ annual / 15 μg/m³ 24-hr</span>
+                  </div>
+                  <p style="font-size:12px;color:var(--text2);">Fine particulate matter — most harmful pollutant. These are the strictest globally recommended limits.</p>
+                </div>
+                <div style="padding:12px;border-radius:8px;background:var(--card2);border:1px solid var(--border);">
+                  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                    <strong style="font-size:14px;">PM10</strong>
+                    <span style="font-family:var(--font-mono);font-size:12px;color:var(--accent);">15 μg/m³ annual / 45 μg/m³ 24-hr</span>
+                  </div>
+                  <p style="font-size:12px;color:var(--text2);">Coarse dust particles from roads, construction, and industrial sources.</p>
+                </div>
+                <div style="padding:12px;border-radius:8px;background:var(--card2);border:1px solid var(--border);">
+                  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                    <strong style="font-size:14px;">NO₂</strong>
+                    <span style="font-family:var(--font-mono);font-size:12px;color:var(--accent);">10 μg/m³ annual / 25 μg/m³ 24-hr</span>
+                  </div>
+                  <p style="font-size:12px;color:var(--text2);">Nitrogen dioxide from traffic and combustion. Linked to respiratory disease.</p>
+                </div>
+                <div style="padding:12px;border-radius:8px;background:var(--card2);border:1px solid var(--border);">
+                  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                    <strong style="font-size:14px;">Ozone (O₃)</strong>
+                    <span style="font-family:var(--font-mono);font-size:12px;color:var(--accent);">60 μg/m³ 8-hr peak season</span>
+                  </div>
+                  <p style="font-size:12px;color:var(--text2);">Ground-level ozone formed from vehicle and industrial emissions in sunlight.</p>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:16px;">
+              <div class="card">
+                <div class="card-title">WHO HEALTH PROTECTION ACTIONS</div>
+                <div class="skincare-tip"><div class="skincare-tip-text"><strong>Reduce exposure time:</strong> WHO advises limiting time outdoors when AQI exceeds 100. Reschedule vigorous outdoor exercise to low-pollution periods (early morning or after rain).</div></div>
+                <div class="skincare-tip"><div class="skincare-tip-text"><strong>Indoor air protection:</strong> Use HEPA air purifiers, avoid smoking indoors, reduce candle or incense burning, and ensure proper kitchen ventilation to reduce indoor PM2.5.</div></div>
+                <div class="skincare-tip"><div class="skincare-tip-text"><strong>Respiratory protection:</strong> N95/FFP2 respirators filter 95% of airborne particles. Regular surgical masks offer limited protection against PM2.5.</div></div>
+                <div class="skincare-tip"><div class="skincare-tip-text"><strong>High-risk groups:</strong> WHO identifies pregnant women, infants, children under 5, adults over 65, and those with cardiorespiratory disease as requiring extra protection at all AQI levels.</div></div>
+              </div>
+              <div class="card">
+                <div class="card-title">WHO — MUMBAI CONTEXT</div>
+                <div class="skincare-tip"><div class="skincare-tip-text"><strong>PM2.5 gap:</strong> Mumbai's average PM2.5 (~60 μg/m³ annually) is 12× the WHO guideline of 5 μg/m³, representing a major public health burden.</div></div>
+                <div class="skincare-tip"><div class="skincare-tip-text"><strong>Disease burden:</strong> WHO estimates 7 million deaths globally per year from air pollution. Urban India is among the highest-risk regions for chronic respiratory and cardiovascular disease from PM exposure.</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- HEALTH EFFECTS TAB -->
+        <div id="tab-health" class="guideline-tab" style="display:none;">
+          <div class="section-title">Health Effects by Age Group</div>
+          <p style="font-size:13px;color:var(--text2);margin-bottom:20px;">Age-specific health impacts of air pollution exposure in Mumbai.</p>
+          <div id="health-effects-full-container"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TEAM PAGE -->
+    <div class="page" id="page-team">
+      <div class="container">
+        <div class="page-title">Our Team</div>
+        <div class="page-sub">The researchers and engineers behind AirSense Mumbai</div>
+        <div class="grid-3" style="margin-bottom:40px;">
+          <div class="team-card">
+            <div class="team-avatar">IM</div>
+            <div class="team-name">Iqra Miyaji</div>
+            <div class="team-degree">B.Tech — Data Science</div>
+            <div class="team-achievements">
+              <!-- <span class="achievement-tag"></span> -->
+              <span class="achievement-tag">Research Paper</span>
+              <span class="achievement-tag">CUNY Intern</span>
+            </div>
+            <div class="team-links">
+              <a href="#" onclick="window.location='mai'+'lto:miyajiiqra'+'@gmail.com';return false;" class="team-link">Email</a>
+              <a href="https://www.linkedin.com/in/iqra-miyaji-/" target="_blank" class="team-link">LinkedIn</a>
+            </div>
+          </div>
+          <div class="team-card">
+            <div class="team-avatar" style="background:linear-gradient(135deg,#f093fb,#f5576c);">RJ</div>
+            <div class="team-name">Reshma Jaiswar</div>
+            <div class="team-degree">B.Tech — Data Science</div>
+            <div class="team-achievements">
+              <!-- <span class="achievement-tag">AI Researcher</span> -->
+              <span class="achievement-tag">Data Analyst</span>
+              <span class="achievement-tag">CUNY Intern</span>
+            </div>
+            <div class="team-links">
+              <a href="#" onclick="window.location='mai'+'lto:reshmajaiswar7'+'@gmail.com';return false;" class="team-link">Email</a>
+              <a href="https://l1nk.dev/3bha5hl" target="_blank" class="team-link">LinkedIn</a>
+            </div>
+          </div>
+          <div class="team-card">
+            <div class="team-avatar" style="background:linear-gradient(135deg,#4facfe,#00f2fe);">DC</div>
+            <div class="team-name">Dhwani Chheda</div>
+            <div class="team-degree">B.Tech — Data Science</div>
+            <div class="team-achievements">
+              <span class="achievement-tag">Data Analyst</span>
+              <!-- <span class="achievement-tag">UI Designer</span> -->
+              <span class="achievement-tag">Internship</span>
+            </div>
+            <div class="team-links">
+              <a href="#" onclick="window.location='mai'+'lto:dchheda172'+'@gmail.com';return false;" class="team-link">Email</a>
+              <a href="https://l1nk.dev/fuizvcx" target="_blank" class="team-link">LinkedIn</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Research / Achievements -->
+        <div class="section-title">Research &amp; Achievements</div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">RESEARCH PAPERS</div>
+            <div class="skincare-tip">
+              <div class="skincare-tip-icon" style="font-size:14px;font-weight:700;color:var(--accent);">📄</div>
+              <div class="skincare-tip-text">
+                <strong><a href="https://drive.google.com/file/d/1Be3MTZZZKvM20nsfWTXpkBhHUTI_ddp-/view?usp=sharing" target="_blank" style="color:var(--accent);text-decoration:none;">"Analyzing Weather Parameters to Predict Optimal Timing for Cognitive Development of Humans"</a></strong> — AQI and PM2.5 levels influence optimal time windows for safe physical and cognitive activities.
+                <div style="font-size:11px;color:var(--text3);margin-top:4px;">ISBN: 978-93-6076-799-0</div>
+              </div>
+            </div>
+            <div class="skincare-tip">
+              <div class="skincare-tip-icon" style="font-size:14px;font-weight:700;color:var(--accent);">📄</div>
+              <div class="skincare-tip-text">
+                <strong><a href="https://drive.google.com/file/d/1TpWFG1MeY5uUDUluMWko8aF-JEkKtjOM/view?usp=sharing" target="_blank" style="color:var(--accent);text-decoration:none;">"Phytoremediation Strategies for Improving Enclosed Indoor Air Quality"</a></strong> — Indoor plants improve IAQ by reducing CO₂, VOCs, and PM through phytoremediation in controlled environments.
+                <div style="font-size:11px;color:var(--text3);margin-top:4px;">ISBN: 978-93-48606-60-0</div>
+              </div>
+            </div>
+            <div class="skincare-tip">
+              <div class="skincare-tip-icon" style="font-size:14px;font-weight:700;color:var(--accent);">📄</div>
+              <div class="skincare-tip-text">
+                <strong><a href="https://mrrjournal.in/uploads/articles/MRR20264311.pdf" target="_blank" style="color:var(--accent);text-decoration:none;">"Scalable Spatiotemporal Estimation of Particulate Matter via MultiSource Data Fusion and Deep Learning: A Comprehensive Review"</a></strong> — Satellite AOD and ML models improve PM2.5/PM10 estimation and forecasting despite sparse ground monitoring networks.
+                <div style="font-size:11px;color:var(--text3);margin-top:4px;">ISSN No: 2584-184X</div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">HACKATHONS & INTERNSHIPS</div>
+            <div class="skincare-tip">
+              <div class="skincare-tip-icon" style="font-size:14px;font-weight:700;color:var(--moderate);">Award</div>
+              <div class="skincare-tip-text"><strong>WATCH Weather and climate International </strong> — Represented University at International Hackathons.</div>
+            </div>
+            <div class="skincare-tip">
+              <div class="skincare-tip-icon" style="font-size:14px;font-weight:700;color:var(--accent);">Edu</div>
+              <div class="skincare-tip-text"><strong>CUNY Research Internship</strong> — Collaborative research with City University of New York  and SNDT Womens University on urban air quality monitoring systems.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end main -->
+</div><!-- end app -->
+
+<!-- CHATBOT -->
+<button class="chatbot-fab" id="chatbot-fab" onclick="toggleChat()">AI</button>
+<div class="chatbot-panel" id="chatbot-panel">
+  <div class="chat-header">
+    <div class="chat-avatar" style="font-size:13px;font-weight:700;">AI</div>
+    <div class="chat-header-info">
+      <h4>AirSense AI</h4>
+      <p>AQI &amp; Health Assistant</p>
+    </div>
+    <button class="chat-close" onclick="toggleChat()">✕</button>
+  </div>
+  <div class="chat-messages" id="chat-messages">
+    <div class="chat-msg bot">Hi! I am your AirSense AI assistant. Ask me about AQI, air pollution, skincare tips, or indoor air quality!</div>
+  </div>
+  <div class="typing-indicator" id="typing-indicator">
+    <div class="typing-dots">
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+    </div>
+  </div>
+  <div class="chat-input-row">
+    <input class="chat-input" id="chat-input" placeholder="Ask about AQI, health, skincare..." onkeydown="if(event.key==='Enter')sendChat()"/>
+    <button class="chat-send" onclick="sendChat()">➤</button>
+  </div>
+</div>
+
+<script data-cfasync="false">
+// ===== DATA =====
+const CSV_DATA = [
+  {date:"2025-NOV-01",aqi:168},{date:"2025-NOV-02",aqi:165},{date:"2025-NOV-03",aqi:58},
+  {date:"2025-NOV-04",aqi:124},{date:"2025-NOV-05",aqi:135},{date:"2025-NOV-06",aqi:142},
+  {date:"2025-NOV-07",aqi:148},{date:"2025-NOV-08",aqi:155,pred:138.42},
+  {date:"2025-NOV-09",aqi:162,pred:130.99},{date:"2025-NOV-10",aqi:158,pred:130.79},
+  {date:"2025-NOV-11",aqi:152,pred:131.25},{date:"2025-NOV-12",aqi:147,pred:126.01},
+  {date:"2025-NOV-13",aqi:150,pred:120.65},{date:"2025-NOV-14",aqi:170,pred:122.08},
+  {date:"2025-NOV-15",aqi:165,pred:125.71},{date:"2025-NOV-16",aqi:168,pred:140.02},
+  {date:"2025-NOV-17",aqi:166,pred:134.36},{date:"2025-NOV-18",aqi:200,pred:128.22},
+  {date:"2025-NOV-19",aqi:162,pred:131.20},{date:"2025-NOV-20",aqi:162,pred:132.33},
+  {date:"2025-NOV-21",aqi:170,pred:135.50},{date:"2025-NOV-22",aqi:185,pred:140.20},
+  {date:"2025-NOV-23",aqi:210,pred:155.60},{date:"2025-NOV-24",aqi:302,pred:190.30},
+  {date:"2025-NOV-25",aqi:315,pred:220.10},{date:"2025-NOV-26",aqi:308,pred:240.55},
+  {date:"2025-NOV-27",aqi:342,pred:270.80},{date:"2025-NOV-28",aqi:300,pred:285.40},
+  {date:"2025-NOV-29",aqi:158,pred:260.20},{date:"2025-NOV-30",aqi:145,pred:180.10},
+  {date:"2025-DEC-01",aqi:120,pred:140.30},{date:"2025-DEC-02",aqi:135,pred:128.50},
+  {date:"2025-DEC-03",aqi:142,pred:132.10},{date:"2025-DEC-10",aqi:178,pred:155.30},
+  {date:"2025-DEC-15",aqi:195,pred:170.20},{date:"2025-DEC-20",aqi:220,pred:200.10},
+  {date:"2026-JAN-05",aqi:185,pred:165.40},{date:"2026-JAN-15",aqi:160,pred:148.20},
+  {date:"2026-FEB-19",aqi:82,pred:90.50},{date:"2026-FEB-20",aqi:130,pred:115.30},
+  {date:"2026-FEB-21",aqi:180,pred:160.20},{date:"2026-FEB-22",aqi:175,pred:162.10},
+  {date:"2026-FEB-23",aqi:168,pred:158.40},{date:"2026-FEB-24",aqi:152,pred:145.80},
+  {date:"2026-FEB-25",aqi:145,pred:138.60},{date:"2026-FEB-26",aqi:93,pred:110.20},
+  {date:"2026-FEB-27",aqi:63,pred:78.40},{date:"2026-FEB-28",aqi:58,pred:65.10},
+];
+
+const MUMBAI_AREAS = [
+  {name:"Bandra",aqi:142},{name:"Andheri",aqi:168},{name:"Kurla",aqi:195},
+  {name:"Worli",aqi:128},{name:"Colaba",aqi:98},{name:"Powai",aqi:155},
+  {name:"Thane",aqi:202},{name:"Navi Mumbai",aqi:118},{name:"Borivali",aqi:175},
+  {name:"Juhu",aqi:135},{name:"Dharavi",aqi:225},{name:"Chembur",aqi:188},
+  {name:"Malad",aqi:162},{name:"Goregaon",aqi:148},{name:"Dadar",aqi:172},
+  {name:"Lower Parel",aqi:145},{name:"Vikhroli",aqi:182},{name:"Mulund",aqi:158}
+];
+
+const MOCK_NEWS = [
+  {source:"Times of India",title:"Mumbai AQI Crosses 200 Mark in Dharavi — Residents Urged to Stay Indoors",snippet:"Air quality in Dharavi dropped to the 'Unhealthy' category Wednesday as AQI readings hit 225. Authorities have issued an advisory for residents with pre-existing respiratory conditions.",date:"Apr 8, 2026"},
+  {source:"Hindustan Times",title:"Maharashtra Govt Launches New Real-Time AQI Monitoring Stations Across Mumbai",snippet:"Six new monitoring stations will be installed in underserved areas to provide 24/7 pollution data. The initiative is funded under the Smart Cities Mission.",date:"Apr 7, 2026"},
+  {source:"NDTV",title:"Study: Mumbai PM2.5 Levels 3x WHO Safe Limit During Winter Months",snippet:"A IITB study found that Mumbai's PM2.5 concentrations between November and January consistently exceed WHO guidelines by a factor of three, driven by vehicular emissions and construction dust.",date:"Apr 6, 2026"},
+  {source:"Indian Express",title:"Mangrove Restoration Project Shows 12% AQI Improvement in Coastal Areas",snippet:"Areas near restored mangrove belts in Navi Mumbai and Thane show measurably better air quality compared to inland zones with similar traffic density.",date:"Apr 5, 2026"},
+  {source:"The Hindu",title:"Air Purifier Demand in Mumbai Surges 40% During Winter Pollution Season",snippet:"Sales data from major electronics retailers show a significant uptick in air purifier purchases as Mumbai residents increasingly seek protection from seasonal pollution spikes.",date:"Apr 4, 2026"},
+];
+
+// ===== STATE =====
+let currentUser = null;
+let currentAgeGroup = 'youth';
+let currentPage = 'home';
+let selectedArea = null;
+let chatOpen = false;
+let charts = {};
+let OPENAI_KEY = '';
+
+// ===== AUTH =====
+let selectedAgeGroup = null;
+function selectAge(group) {
+  selectedAgeGroup = group;
+  document.querySelectorAll('.age-option').forEach(el => el.classList.remove('selected'));
+  document.getElementById('age-'+group).classList.add('selected');
+}
+function switchAuthTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach(el => el.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('login-form').style.display = tab==='login' ? 'block' : 'none';
+  document.getElementById('signup-form').style.display = tab==='signup' ? 'block' : 'none';
+}
+function demoLogin(ageGroup) {
+  currentUser = { email: 'demo@airsense.app', ageGroup };
+  currentAgeGroup = ageGroup;
+  launchApp();
+}
+function doLogin() {
+  document.getElementById('login-error').style.display='none';
+  const email = document.getElementById('login-email').value;
+  const pass = document.getElementById('login-pass').value;
+  if (!email || !pass) { document.getElementById('login-error').style.display='block'; return; }
+  const saved = JSON.parse(localStorage.getItem('airsense-users')||'{}');
+  if (saved[email] && saved[email].password === pass) {
+    currentUser = { email, ageGroup: saved[email].ageGroup };
+    currentAgeGroup = currentUser.ageGroup;
+    launchApp();
+  } else {
+    document.getElementById('login-error').style.display='block';
+  }
+}
+function doSignup() {
+  const email = document.getElementById('signup-email').value;
+  const pass = document.getElementById('signup-pass').value;
+  if (!email || !pass || !selectedAgeGroup) {
+    document.getElementById('signup-error').style.display='block'; return;
+  }
+  const saved = JSON.parse(localStorage.getItem('airsense-users')||'{}');
+  saved[email] = { password: pass, ageGroup: selectedAgeGroup };
+  localStorage.setItem('airsense-users', JSON.stringify(saved));
+  currentUser = { email, ageGroup: selectedAgeGroup };
+  currentAgeGroup = selectedAgeGroup;
+  launchApp();
+}
+function doLogout() {
+  document.getElementById('app').style.display='none';
+  document.getElementById('auth-screen').style.display='flex';
+  currentUser = null;
+}
+function launchApp() {
+  document.getElementById('auth-screen').style.display='none';
+  document.getElementById('app').style.display='block';
+  const emailLabel = document.getElementById('mobile-email-label');
+  if(emailLabel) emailLabel.textContent = currentUser?.email || '';
+  applyTheme();
+  initApp();
+}
+
+function toggleMobileNav() {
+  const drawer = document.getElementById('mobile-drawer');
+  const btn = document.getElementById('hamburger');
+  const isOpen = drawer.classList.toggle('open');
+  btn.classList.toggle('open', isOpen);
+}
+function closeMobileNav() {
+  document.getElementById('mobile-drawer').classList.remove('open');
+  document.getElementById('hamburger').classList.remove('open');
+}
+
+// ===== THEME =====
+function applyTheme() {
+  const body = document.body;
+  body.className = '';
+  const themeMap = { kid:'theme-kid', youth:'theme-youth', adult:'theme-adult', senior:'theme-senior' };
+  body.classList.add(themeMap[currentAgeGroup] || 'theme-youth');
+  const labelMap = { kid:'EXPLORER', youth:'YOUTH', adult:'PRO', senior:'COMFORT' };
+  document.getElementById('theme-badge').textContent = labelMap[currentAgeGroup];
+  const initial = (currentUser?.email||'U')[0].toUpperCase();
+  document.getElementById('nav-user').textContent = initial;
+  document.getElementById('kid-welcome').style.display = currentAgeGroup==='kid' ? 'block' : 'none';
+  document.getElementById('senior-welcome').style.display = currentAgeGroup==='senior' ? 'block' : 'none';
+  document.getElementById('kid-badges').style.display = currentAgeGroup==='kid' ? 'block' : 'none';
+  // Senior font size
+  if(currentAgeGroup==='senior') {
+    document.body.style.fontSize='17px';
+  } else {
+    document.body.style.fontSize='';
+  }
+}
+
+// ===== AQI HELPERS =====
+function aqiCategory(val) {
+  if(val<=50) return {cat:'Good',color:'var(--good)',pct:val/500};
+  if(val<=100) return {cat:'Moderate',color:'var(--moderate)',pct:val/500};
+  if(val<=150) return {cat:'Unhealthy for Sensitive',color:'var(--poor)',pct:val/500};
+  if(val<=200) return {cat:'Unhealthy',color:'var(--poor)',pct:val/500};
+  if(val<=300) return {cat:'Very Unhealthy',color:'var(--vp)',pct:val/500};
+  return {cat:'Hazardous',color:'#7950f2',pct:Math.min(val/500,1)};
+}
+function aqiBgClass(val) {
+  if(val<=50) return 'bg-good';
+  if(val<=100) return 'bg-moderate';
+  if(val<=150) return 'bg-poor';
+  if(val<=200) return 'bg-poor';
+  if(val<=300) return 'bg-vp';
+  return 'bg-hazardous';
+}
+
+// ===== INIT =====
+function initApp() {
+  createParticles();
+  initHome();
+  initPrediction();
+  initIndoor();
+  initLocation();
+  initNews();
+  setInterval(updateTimestamp, 30000);
+}
+
+function createParticles() {
+  const container = document.getElementById('particles');
+  container.innerHTML = '';
+  if(currentAgeGroup==='adult' || currentAgeGroup==='senior') return;
+  for(let i=0;i<15;i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = Math.random()*8+4;
+    p.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}%;animation-duration:${Math.random()*15+10}s;animation-delay:${Math.random()*10}s;opacity:${Math.random()*0.4+0.1}`;
+    container.appendChild(p);
+  }
+}
+
+function updateTimestamp() {
+  const now = new Date();
+  document.getElementById('last-updated').textContent = `Last updated: ${now.toLocaleTimeString('en-IN')}`;
+}
+
+// ===== HOME =====
+function initHome() {
+  const currentAQI = 158;
+  const info = aqiCategory(currentAQI);
+  document.getElementById('aqi-display').textContent = currentAQI;
+  document.getElementById('aqi-display').style.color = info.color;
+  document.getElementById('aqi-cat-label').textContent = info.cat;
+  document.getElementById('aqi-cat-label').style.color = info.color;
+  document.getElementById('aqi-needle').style.left = (info.pct*100)+'%';
+  document.getElementById('nav-aqi-badge').textContent = 'AQI '+currentAQI;
+
+  // Alert banner
+  const alertBanner = document.getElementById('health-alert-banner');
+  alertBanner.className = 'health-alert warning';
+  document.getElementById('alert-text-content').textContent = 'People with respiratory issues should limit outdoor exposure. Wear N95 masks when going out.';
+
+  // Weekly forecast
+  const weekData = [
+    {day:'Today',aqi:158},{day:'Thu',aqi:143},{day:'Fri',aqi:128},
+    {day:'Sat',aqi:165},{day:'Sun',aqi:190},{day:'Mon',aqi:155},{day:'Tue',aqi:132}
+  ];
+  const wf = document.getElementById('week-forecast');
+  wf.innerHTML = weekData.map(d => {
+    const inf = aqiCategory(d.aqi);
+    return `<div class="day-forecast">
+      <div class="day-name">${d.day}</div>
+      <div class="day-aqi" style="color:${inf.color}">${d.aqi}</div>
+      <div class="day-cat ${aqiBgClass(d.aqi)}">${inf.cat.split(' ')[0]}</div>
+    </div>`;
+  }).join('');
+
+  // Hourly chart
+  const hourlyCtx = document.getElementById('hourlyChart').getContext('2d');
+  const hours = ['6AM','8AM','10AM','12PM','2PM','4PM','6PM','8PM','10PM'];
+  const hourlyAqi = [145,152,160,168,172,165,158,150,142];
+  if(charts.hourly) charts.hourly.destroy();
+  charts.hourly = new Chart(hourlyCtx, {
+    type:'line',
+    data:{
+      labels:hours,
+      datasets:[{
+        label:'AQI',
+        data:hourlyAqi,
+        borderColor:'#ff922b',
+        backgroundColor:'rgba(255,146,43,0.1)',
+        fill:true,
+        tension:0.4,
+        pointBackgroundColor:'#ff922b',
+        pointRadius:4
+      }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#8891bb',font:{size:11}}},
+        y:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#8891bb',font:{size:11}},min:100,max:200}
+      }
+    }
+  });
+
+  // Skincare
+  renderSkincareModule(currentAQI);
+  updateTimestamp();
+}
+
+function renderSkincareModule(aqi) {
+  const ssi = Math.max(0, Math.min(100, Math.round(100 - (aqi/500)*100)));
+  document.getElementById('skin-ssi').textContent = ssi;
+  const pct = (100-ssi);
+  document.getElementById('skin-needle').style.left = Math.min(pct, 95)+'%';
+  const risk = ssi > 70 ? 'Low Risk' : ssi > 40 ? 'Moderate Risk' : 'High Risk';
+  const riskColor = ssi > 70 ? 'var(--good)' : ssi > 40 ? 'var(--moderate)' : 'var(--vp)';
+  const badge = document.getElementById('skin-risk-badge');
+  badge.textContent = risk;
+  badge.style.color = riskColor;
+  badge.style.background = `${riskColor.replace('var(','rgba(').replace(')',',0.15)')}`;
+
+  let tips = [];
+  if(currentAgeGroup === 'kid') {
+    tips = [
+      {icon:'Care',text:'Use a gentle sunscreen (SPF 30+) before going outside, even on cloudy days when pollution is high!'},
+      {icon:'💧',text:'Wash your face with clean water when you get home from school to remove pollution particles.'},
+      {icon:'🥤',text:'Drink lots of water — it keeps your skin healthy and helps your body fight pollution!'},
+    ];
+  } else if(currentAgeGroup === 'youth') {
+    tips = [
+      {icon:'Care',text:'Double-cleanse tonight: oil cleanser first to dissolve pollution particles, then foaming cleanser. PM2.5 is causing your clogged pores.'},
+      {icon:'☀️',text:'Apply SPF 50 PA+++ broad-spectrum sunscreen. Pollution intensifies UV damage — use an anti-pollution primer too.'},
+      {icon:"Plant",text:'Add Vitamin C serum to your AM routine — it neutralizes free radicals from pollution and brightens dull skin.'},
+      {icon:'🛡️',text:'Anti-pollution tip: Niacinamide 10% in your routine strengthens the skin barrier against PM2.5 penetration.'},
+    ];
+  } else if(currentAgeGroup === 'adult') {
+    tips = [
+      {icon:'Care',text:'Use a rich antioxidant cleanser in the evening. Pollution accelerates collagen breakdown — cleanse thoroughly.'},
+      {icon:'💊',text:'Add Vitamin E and CoQ10 supplements — systemic antioxidant support is crucial at higher AQI levels.'},
+      {icon:'🌙',text:'Use a retinoid or peptide cream at night to counteract pollution-induced premature aging.'},
+    ];
+  } else {
+    tips = [
+      {icon:'💧',text:'Moisturize well — older skin has a weaker barrier that lets more pollutants penetrate.'},
+      {icon:'Care',text:'Use SPF 30+ daily even indoors. Pollution + UV causes significant skin damage in seniors.'},
+      {icon:'Med',text:'If you notice new skin spots or rashes during high AQI days, consult your dermatologist promptly.'},
+    ];
+  }
+  document.getElementById('skincare-tips').innerHTML = tips.map(t =>
+    `<div class="skincare-tip"><div class="skincare-tip-icon">${t.icon}</div><div class="skincare-tip-text">${t.text}</div></div>`
+  ).join('');
+}
+
+// ===== PREDICTION =====
+let filterMode = 'week';
+function setFilter(mode) {
+  filterMode = mode;
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  renderPredictionCharts();
+}
+
+function getFilteredData() {
+  const withPred = CSV_DATA.filter(d => d.pred !== undefined);
+  if(filterMode === 'week') return withPred.slice(-7);
+  if(filterMode === 'month') return withPred.slice(-30);
+  return withPred;
+}
+
+function initPrediction() {
+  renderPredictionCharts();
+  renderPredTable();
+}
+
+function renderPredictionCharts() {
+  const data = getFilteredData();
+  const labels = data.map(d => d.date.replace('2025-','').replace('2026-',''));
+  const actuals = data.map(d => d.aqi);
+  const preds = data.map(d => d.pred);
+
+  // Trend chart
+  const tCtx = document.getElementById('trendChart').getContext('2d');
+  if(charts.trend) charts.trend.destroy();
+  charts.trend = new Chart(tCtx, {
+    type:'line',
+    data:{labels,datasets:[
+      {label:'Actual AQI',data:actuals,borderColor:'#6378ff',backgroundColor:'rgba(99,120,255,0.1)',fill:true,tension:0.3,pointRadius:3},
+      {label:'Predicted AQI',data:preds,borderColor:'#38d9a9',backgroundColor:'rgba(56,217,169,0.05)',fill:false,tension:0.3,pointRadius:3,borderDash:[5,5]}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#8891bb',font:{size:12}}}},
+      scales:{x:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#8891bb',font:{size:10},maxTicksLimit:10}},
+        y:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#8891bb',font:{size:11}}}}}
+  });
+
+  // Weekly forecast
+  const weekLabels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const weekPred = [165,155,143,128,172,190,145];
+  const wCtx = document.getElementById('weekPredChart').getContext('2d');
+  if(charts.weekPred) charts.weekPred.destroy();
+  charts.weekPred = new Chart(wCtx, {
+    type:'bar',
+    data:{labels:weekLabels,datasets:[{
+      label:'Predicted AQI',
+      data:weekPred,
+      backgroundColor:weekPred.map(v => v<=50?'rgba(56,217,169,0.6)':v<=100?'rgba(255,212,59,0.6)':v<=150?'rgba(255,146,43,0.6)':'rgba(255,107,107,0.6)'),
+      borderRadius:8
+    }]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{grid:{display:false},ticks:{color:'#8891bb'}},y:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#8891bb'}}}}
+  });
+
+  // Category donut
+  const cats = {Good:0,Moderate:0,Poor:0,'Very Poor':0,Hazardous:0};
+  CSV_DATA.forEach(d => {
+    if(d.aqi<=50) cats.Good++;
+    else if(d.aqi<=100) cats.Moderate++;
+    else if(d.aqi<=200) cats.Poor++;
+    else if(d.aqi<=300) cats['Very Poor']++;
+    else cats.Hazardous++;
+  });
+  const cCtx = document.getElementById('categoryChart').getContext('2d');
+  if(charts.cat) charts.cat.destroy();
+  charts.cat = new Chart(cCtx, {
+    type:'doughnut',
+    data:{
+      labels:Object.keys(cats),
+      datasets:[{data:Object.values(cats),backgroundColor:['rgba(56,217,169,0.8)','rgba(255,212,59,0.8)','rgba(255,146,43,0.8)','rgba(255,107,107,0.8)','rgba(121,80,242,0.8)'],borderWidth:0}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#8891bb',font:{size:12}}}}}
+  });
+}
+
+function renderPredTable() {
+  const tbody = document.getElementById('pred-table-body');
+  const data = CSV_DATA.filter(d => d.pred !== undefined);
+  tbody.innerHTML = data.map(d => {
+    const err = d.pred ? (d.aqi - d.pred).toFixed(1) : '—';
+    const errColor = Math.abs(d.aqi-d.pred) > 40 ? '#ff6b6b' : '#38d9a9';
+    const info = aqiCategory(d.aqi);
+    return `<tr style="border-bottom:1px solid var(--border);">
+      <td style="padding:10px;color:var(--text2);font-family:var(--font-mono);font-size:12px;">${d.date}</td>
+      <td style="padding:10px;text-align:right;font-weight:600;">${d.aqi}</td>
+      <td style="padding:10px;text-align:right;color:#38d9a9;font-family:var(--font-mono);">${d.pred?.toFixed(1)||'—'}</td>
+      <td style="padding:10px;text-align:right;color:${errColor};font-family:var(--font-mono);">${err}</td>
+      <td style="padding:10px;text-align:center;"><span style="padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;" class="${aqiBgClass(d.aqi)}">${info.cat.split(' ')[0]}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+// ===== INDOOR =====
+function initIndoor() {}
+function calcPlants() {
+  const size = parseFloat(document.getElementById('room-size').value) || 200;
+  const occ = parseFloat(document.getElementById('occupants').value) || 4;
+  let count = Math.ceil(size * 0.33);
+  count = Math.ceil(count * (1 + occ * 0.05));
+  document.getElementById('plant-count').textContent = count;
+  document.getElementById('plant-calc-detail').textContent = `For ${size} sq ft with ${occ} occupant(s)`;
+  const plants = [
+    {name:'Areca Palm',emoji:'🌴',benefit:'Removes xylene & toluene, excellent humidifier. Best for living rooms.',url:'https://www.zepto.com/pn/ugaoo-areca-palm-plant-with-self-watering-pot/pvid/48cf6cd4-fe92-46da-97d7-1d655370eb23'},
+    {name:'Snake Plant',emoji:'🌿',benefit:'Releases O₂ at night, removes formaldehyde & benzene. Perfect for bedrooms.',url:'https://www.amazon.in/Snake-Plant-Good-indoor-Balcony/dp/B0CDRH9B29'},
+    {name:'Money Plant',emoji:'🪴',benefit:'Highly effective at removing CO₂ and VOCs. Easy to grow anywhere indoors.',url:'https://www.meesho.com/money-plant-for-home-indoor-plantsuper-quality-best-plant/p/9ae983'},
+  ];
+  document.getElementById('plant-list').innerHTML = plants.map(p =>
+    `<div class="plant-card">
+      <div class="plant-emoji">${p.emoji}</div>
+      <div class="plant-info"><h4>${p.name}</h4><p>${p.benefit}</p></div>
+      <a href="${p.url}" target="_blank" class="plant-buy-link">🛒 Buy</a>
+    </div>`
+  ).join('');
+  document.getElementById('plant-results').style.display = 'block';
+}
+
+// ===== LOCATION =====
+let areaChartInstance = null;
+function initLocation() {
+  // Map zones are static SVG — just add hover style
+  document.querySelectorAll('.map-zone').forEach(z => {
+    z.addEventListener('mouseenter', function() { this.style.opacity = '0.8'; this.style.filter = 'brightness(1.3)'; });
+    z.addEventListener('mouseleave', function() { this.style.opacity = '1'; this.style.filter = ''; });
+  });
+  renderAreaChart(MUMBAI_AREAS);
+}
+
+function selectArea(idx) {
+  selectedArea = MUMBAI_AREAS[idx];
+  // Reset all SVG zones
+  document.querySelectorAll('.map-zone').forEach(z => z.style.filter = '');
+  // Highlight selected zone
+  const selectedZone = document.getElementById('zone-'+idx);
+  if(selectedZone) { selectedZone.style.filter = 'brightness(1.5) drop-shadow(0 0 6px white)'; }
+  const info = aqiCategory(selectedArea.aqi);
+  document.getElementById('selected-area-name').textContent = selectedArea.name;
+  document.getElementById('selected-aqi').textContent = selectedArea.aqi;
+  document.getElementById('selected-aqi').style.color = info.color;
+  document.getElementById('selected-cat').textContent = info.cat;
+  document.getElementById('selected-cat').style.color = info.color;
+  const messages = {
+    'Good':'Air quality is satisfactory. Safe for all activities.',
+    'Moderate':'Unusually sensitive people should consider limiting prolonged outdoor exertion.',
+    'Unhealthy for Sensitive':'Sensitive groups should reduce prolonged or heavy exertion.',
+    'Unhealthy':'Everyone may begin to experience health effects. Sensitive groups: avoid outdoor activity.',
+    'Very Unhealthy':'Health alert! Everyone should avoid prolonged outdoor exertion.',
+    'Hazardous':'Health emergency! Everyone should avoid all outdoor activity.',
+  };
+  document.getElementById('selected-health').textContent = messages[info.cat] || 'Monitor conditions.';
+  // Update home AQI too
+  document.getElementById('nav-aqi-badge').textContent = `AQI ${selectedArea.aqi} (${selectedArea.name})`;
+}
+
+function renderAreaChart(areas) {
+  const ctx = document.getElementById('areaChart').getContext('2d');
+  if(areaChartInstance) areaChartInstance.destroy();
+  const topAreas = areas.slice(0,8);
+  areaChartInstance = new Chart(ctx, {
+    type:'bar',
+    data:{
+      labels:topAreas.map(a=>a.name),
+      datasets:[{
+        label:'AQI',
+        data:topAreas.map(a=>a.aqi),
+        backgroundColor:topAreas.map(a => {
+          if(a.aqi<=50) return 'rgba(56,217,169,0.7)';
+          if(a.aqi<=100) return 'rgba(255,212,59,0.7)';
+          if(a.aqi<=200) return 'rgba(255,146,43,0.7)';
+          return 'rgba(255,107,107,0.7)';
+        }),
+        borderRadius:6
+      }]
+    },
+    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},
+      scales:{x:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#8891bb'}},y:{grid:{display:false},ticks:{color:'#8891bb',font:{size:11}}}}}
+  });
+}
+
+// ===== NEWS / GUIDELINES TABS =====
+function showGuidelineTab(tab, btn) {
+  document.querySelectorAll('.guideline-tab').forEach(t => t.style.display = 'none');
+  document.querySelectorAll('#page-news .filter-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-'+tab).style.display = 'block';
+  if(btn) btn.classList.add('active');
+}
+
+function initNews() {
+  document.getElementById('news-container').innerHTML = MOCK_NEWS.map(n =>
+    `<div class="news-card">
+      <div class="news-source">${n.source}</div>
+      <div class="news-title">${n.title}</div>
+      <div class="news-snippet">${n.snippet}</div>
+      <div class="news-date">${n.date}</div>
+    </div>`
+  ).join('');
+
+  const effects = {
+    kid:[
+      {title:'Sneezing & Itchy Eyes',desc:'High AQI can trigger allergies and make asthma worse in children. Always wear a mask!'},
+      {title:'Trouble Concentrating',desc:'Pollution can make it harder to focus in school. Keep windows closed on high-AQI days.'},
+    ],
+    youth:[
+      {title:'Respiratory Stress',desc:'PM2.5 particles penetrate deep into lungs, reducing athletic performance and causing chronic inflammation.'},
+      {title:'Cognitive Decline',desc:'Studies show high AQI correlates with reduced test scores, memory issues, and concentration problems.'},
+      {title:'Skin Aging',desc:'Pollution-generated free radicals degrade collagen 50% faster than UV alone, accelerating premature aging.'},
+    ],
+    adult:[
+      {title:'Cardiovascular Risk',desc:'Long-term exposure to PM2.5 increases stroke and heart attack risk by 20-30% according to WHO data.'},
+      {title:'Chronic Lung Disease',desc:'Sustained exposure above AQI 150 significantly increases COPD risk, especially in non-smokers.'},
+      {title:'Systemic Inflammation',desc:'Air pollutants trigger body-wide inflammation linked to diabetes, arthritis, and immune dysfunction.'},
+    ],
+    senior:[
+      {title:'HIGH RISK: Heart & Lungs',desc:'Seniors face the greatest risk. Even moderate AQI (100-150) can trigger cardiac events. Monitor symptoms closely.'},
+      {title:'SEEK HELP IMMEDIATELY IF...',desc:'You experience chest pain, severe shortness of breath, confusion, or persistent coughing on high-AQI days.'},
+      {title:'STAY INDOORS',desc:'When AQI exceeds 150, seniors should remain indoors with windows closed and use air purifiers.'},
+    ]
+  };
+
+  const renderEffects = (list) => list.map(e =>
+    `<div class="health-alert warning" style="margin-bottom:12px;flex-direction:column;align-items:flex-start;">
+      <h4 style="font-size:15px;font-weight:700;">${e.title}</h4>
+      <p style="font-size:13px;color:var(--text2);margin-top:8px;">${e.desc}</p>
+    </div>`
+  ).join('');
+
+  const myEffects = effects[currentAgeGroup] || effects.adult;
+  document.getElementById('health-effects-container').innerHTML = renderEffects(myEffects);
+
+  // Full health effects for dedicated tab — show all groups
+  const allGroupsHtml = Object.entries(effects).map(([group, items]) => {
+    const labels = {kid:'Children (10–16)',youth:'Youth (17–34)',adult:'Adults (35–55)',senior:'Seniors (56+)'};
+    return `<div style="margin-bottom:24px;">
+      <div class="section-title" style="font-size:16px;margin-bottom:12px;">${labels[group]}</div>
+      ${renderEffects(items)}
+    </div>`;
+  }).join('');
+  const fullCont = document.getElementById('health-effects-full-container');
+  if(fullCont) fullCont.innerHTML = allGroupsHtml;
+}
+
+// ===== PAGE NAV =====
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  // Match nav link by its onclick attribute for reliability
+  document.querySelectorAll('.nav-link').forEach(l => {
+    const onclick = l.getAttribute('onclick') || '';
+    if(onclick.includes("showPage('"+name+"')")) l.classList.add('active');
+  });
+  currentPage = name;
+  closeMobileNav();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+// ===== CHATBOT =====
+function toggleChat() {
+  chatOpen = !chatOpen;
+  const panel = document.getElementById('chatbot-panel');
+  panel.classList.toggle('open', chatOpen);
+}
+
+async function sendChat() {
+  const input = document.getElementById('chat-input');
+  const msg = input.value.trim();
+  if(!msg) return;
+  input.value = '';
+  appendMsg(msg, 'user');
+  showTyping(true);
+
+  // Local FAQ knowledge base from PDF
+  const FAQ_KB = [
+    {q:['what is aqi','aqi mean','air quality index'],a:'AQI (Air Quality Index) is a number used to indicate how polluted the air is and how it affects health. Higher values indicate more pollution and greater health risk.'},
+    {q:['aqi 0','aqi 50','good aqi'],a:'AQI 0–50 is considered Good. Air quality is clean and safe for everyone.'},
+    {q:['aqi 51','aqi 100','moderate aqi'],a:'AQI 51–100 is Moderate. Air is acceptable but may slightly affect sensitive people.'},
+    {q:['aqi 101','aqi 200','unhealthy sensitive'],a:'AQI 101–200 is Unhealthy for Sensitive Groups — children, elderly, and asthma patients should be cautious.'},
+    {q:['aqi 201','aqi 300','unhealthy'],a:'AQI 201–300 is Unhealthy. Everyone may start experiencing health effects at this level.'},
+    {q:['aqi 300','above 300','very unhealthy','hazardous'],a:'AQI above 300 is Very Unhealthy or Hazardous — it can cause serious health issues for everyone.'},
+    {q:['pm2.5','pm 2.5','fine particle'],a:'PM2.5 are very fine particles that can enter deep into your lungs and bloodstream, causing serious long-term health damage.'},
+    {q:['pm10','pm 10','coarse particle'],a:'PM10 are larger particles that affect breathing and cause irritation to your respiratory system.'},
+    {q:['cause','causes pollution','what causes'],a:'Air pollution is caused by vehicles, industries, construction dust, burning waste, and smoke from various sources.'},
+    {q:['health effect','affect health','health impact','cough','breathing'],a:'High AQI can cause coughing, breathing problems, eye irritation, and long-term lung damage. Sensitive groups are most at risk.'},
+    {q:['what should i do','high aqi','protect myself','stay safe'],a:'When AQI is high: stay indoors, wear an N95 mask outdoors, avoid outdoor activities, and use an air purifier with HEPA filter.'},
+    {q:['who affected','most affected','vulnerable'],a:'Children, elderly people, and those with asthma or heart problems are most affected by air pollution.'},
+    {q:['exercise','outdoor exercise','workout'],a:'Avoid outdoor exercise when AQI is above 150. Exercise indoors instead to protect your lungs.'},
+    {q:['protect','protection','how to protect'],a:'Wear an N95 or N99 mask, stay hydrated, and limit outdoor exposure. Check AQI daily before going out.'},
+    {q:['indoor air','improve indoor','indoor quality'],a:'To improve indoor air quality: use air purifiers with HEPA filters, keep windows closed during high AQI, clean dust regularly, and avoid smoking indoors.'},
+    {q:['plant','snake plant','areca palm','indoor plant'],a:'Yes! Plants like snake plant and areca palm can help slightly improve indoor air quality by filtering some pollutants.'},
+    {q:['rain','does rain help','rain reduce'],a:'Yes, rain helps wash pollutants from the air temporarily, leading to a brief improvement in AQI.'},
+    {q:['winter','why winter','higher winter'],a:'Pollution is higher in winter due to temperature inversion — cold air traps pollutants near the ground instead of dispersing them upward.'},
+    {q:['weather','wind','temperature'],a:'Wind helps reduce pollution by dispersing particles. Heat and low wind speeds increase pollution concentration.'},
+    {q:['skincare','skin','face'],a:'In polluted conditions: cleanse your face properly after being outdoors, use a moisturizer, and apply sunscreen. Double cleansing is recommended on high-AQI days.'},
+    {q:['acne','pores','skin problem'],a:'Yes, pollution can clog pores and lead to acne and dull skin. Always cleanse your face after exposure to polluted air.'},
+    {q:['sunscreen','indoors sunscreen'],a:'Yes, sunscreen is recommended even indoors if you are exposed to sunlight through windows or screens.'},
+    {q:['signs','symptoms','how do i know'],a:'Signs that pollution is affecting your health include: coughing, throat irritation, breathing issues, fatigue, and headaches.'},
+    {q:['check aqi','how often','daily'],a:'Check the AQI at least once daily, especially before planning any outdoor activities.'},
+    {q:['mask','best mask','n95','n99'],a:'N95 or N99 respirator masks are most effective against PM2.5 and fine particulate matter.'},
+    {q:['air purifier','purifier help','hepa'],a:'Yes, air purifiers with HEPA filters are highly effective at removing PM2.5 and other indoor pollutants.'},
+    {q:['safe aqi','safe level'],a:'AQI below 100 is generally considered safe for most people. Below 50 is ideal.'},
+    {q:['kids','children','child aqi'],a:'During high AQI, children should stay indoors, avoid outdoor play, and follow proper hygiene such as washing face and hands after going out.'},
+  ];
+
+  function localFAQ(query) {
+    const q = query.toLowerCase();
+    for(const entry of FAQ_KB) {
+      if(entry.q.some(kw => q.includes(kw))) return entry.a;
+    }
+    return null;
+  }
+
+  // Try local FAQ first
+  const localAnswer = localFAQ(msg);
+  if(localAnswer) {
+    showTyping(false);
+    appendMsg(localAnswer, 'bot');
+    return;
+  }
+
+  try {
+    const currentAQI = 158;
+    const ageCtx = {kid:'child aged 10-16',youth:'young adult aged 17-34',adult:'adult aged 35-55',senior:'senior aged 56+'}[currentAgeGroup];
+    const systemPrompt = `You are AirSense AI, an expert assistant for Mumbai's AQI Monitoring Platform. The current Mumbai AQI is ${currentAQI} (Unhealthy for Sensitive Groups). The user is a ${ageCtx}.
+
+Specialize in: AQI explanations (CPCB and WHO standards), health impacts of air pollution, skincare advice for pollution, indoor air quality tips, plant recommendations, and Mumbai-specific air quality data.
+
+Key facts to use:
+- AQI 0-50: Good | 51-100: Moderate | 101-200: Unhealthy for Sensitive | 201-300: Unhealthy | 300+: Hazardous
+- PM2.5 WHO annual guideline: 5 μg/m³ | CPCB standard: 40 μg/m³
+- Best masks: N95 or N99
+- Best indoor plants: snake plant, areca palm, money plant
+- Protect skin: cleanse after outdoor exposure, use moisturizer and sunscreen
+
+${currentAgeGroup==='kid'?'Use simple clear language, avoid jargon, make it easy for children to understand.':''}
+${currentAgeGroup==='senior'?'Use simple clear language, large concept explanations, focus on health safety.':''}
+Keep responses concise (2-4 sentences). Be helpful and specific to Mumbai air quality context.`;
+
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer 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'},
+      body:JSON.stringify({
+        model:'gpt-4o-mini',
+        max_tokens:1000,
+        messages:[{role:'system',content:systemPrompt},{role:'user',content:msg}]
+      })
+    });
+    const data = await response.json();
+    const reply = data.choices?.[0]?.message?.content || "I am having trouble responding right now. Please try again!";
+    showTyping(false);
+    appendMsg(reply, 'bot');
+  } catch(err) {
+    showTyping(false);
+    appendMsg("Current Mumbai AQI is 158 — Unhealthy for Sensitive Groups. Wear N95 masks outdoors, keep windows closed during peak hours (8AM–12PM), and use a HEPA air purifier indoors. Check the AQI daily before outdoor activities.", 'bot');
+  }
+}
+
+function appendMsg(text, role) {
+  const container = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'chat-msg '+role;
+  div.textContent = text;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function showTyping(show) {
+  const ind = document.getElementById('typing-indicator');
+  ind.style.display = show ? 'block' : 'none';
+  if(show) {
+    const container = document.getElementById('chat-messages');
+    container.scrollTop = container.scrollHeight;
+  }
+}
+
+// ===== VOICE ASSIST (senior) =====
+function readAloud() {
+  const text = `Current Mumbai AQI is 158, which is Unhealthy for Sensitive Groups. People with respiratory conditions should limit outdoor activity. Wear N95 masks if you must go out. Keep windows closed between 8 AM and 12 PM when pollution is highest.`;
+  if('speechSynthesis' in window) {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 0.85;
+    utterance.pitch = 1;
+    window.speechSynthesis.speak(utterance);
+  }
+}
+
+// ===== AUTO-REFRESH =====
+setInterval(() => {
+  // Simulate slight AQI variation
+  const variation = Math.floor(Math.random()*6)-3;
+  const currentAQI = 158 + variation;
+  const info = aqiCategory(currentAQI);
+  const aqiEl = document.getElementById('aqi-display');
+  if(aqiEl) { aqiEl.textContent = currentAQI; aqiEl.style.color = info.color; }
+  const statEl = document.getElementById('curr-aqi-stat');
+  if(statEl) statEl.textContent = currentAQI;
+}, 30000);
+</script>
+</body>
+</html>

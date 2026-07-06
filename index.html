@@ -96,7 +96,7 @@ body {
   transition: all 0.4s ease;
 }
 
-/* AUTH SCREEN */
+/* AGE SELECT SCREEN */
 #auth-screen {
   position: fixed; inset: 0;
   background: linear-gradient(135deg, #05070f 0%, #0a0d1a 50%, #0f0820 100%);
@@ -127,62 +127,33 @@ body {
   margin-bottom: 8px;
 }
 .auth-subtitle { color: #8891bb; font-size: 14px; margin-bottom: 36px; }
-.auth-tabs {
-  display: flex; gap: 4px;
-  background: rgba(255,255,255,0.05);
-  border-radius: 12px; padding: 4px;
-  margin-bottom: 28px;
-}
-.auth-tab {
-  flex: 1; padding: 10px;
-  border: none; background: transparent;
-  color: #8891bb; font-family: var(--font-body);
-  font-size: 14px; font-weight: 500;
-  border-radius: 10px; cursor: pointer;
-  transition: all 0.2s;
-}
-.auth-tab.active {
-  background: rgba(99,120,255,0.2);
-  color: #e8ecff;
-}
-.auth-field { margin-bottom: 16px; }
-.auth-field label { display: block; font-size: 13px; color: #8891bb; margin-bottom: 6px; }
-.auth-field input, .auth-field select {
-  width: 100%; padding: 12px 16px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(99,120,255,0.2);
-  border-radius: 10px; color: #e8ecff;
-  font-family: var(--font-body); font-size: 14px;
-  outline: none; transition: border-color 0.2s;
-}
-.auth-field input:focus, .auth-field select:focus { border-color: rgba(99,120,255,0.6); }
-.auth-field select option { background: #111629; }
 .age-group-grid {
   display: grid; grid-template-columns: 1fr 1fr;
-  gap: 8px; margin-top: 8px;
+  gap: 12px; margin-top: 8px;
 }
 .age-option {
-  padding: 12px; border: 1.5px solid rgba(99,120,255,0.2);
-  border-radius: 10px; cursor: pointer;
+  padding: 20px 12px; border: 1.5px solid rgba(99,120,255,0.2);
+  border-radius: 14px; cursor: pointer;
   text-align: center; transition: all 0.2s;
   background: rgba(255,255,255,0.03);
 }
-.age-option:hover { border-color: rgba(99,120,255,0.5); background: rgba(99,120,255,0.1); }
+.age-option:hover { border-color: rgba(99,120,255,0.5); background: rgba(99,120,255,0.1); transform: translateY(-2px); }
 .age-option.selected { border-color: #6378ff; background: rgba(99,120,255,0.2); }
-.age-option .age-icon { font-size: 24px; margin-bottom: 4px; }
-.age-option .age-label { font-size: 12px; font-weight: 600; color: #e8ecff; }
-.age-option .age-desc { font-size: 11px; color: #8891bb; margin-top: 2px; }
+.age-option .age-icon { font-size: 28px; margin-bottom: 6px; }
+.age-option .age-label { font-size: 14px; font-weight: 700; color: #e8ecff; }
+.age-option .age-desc { font-size: 12px; color: #8891bb; margin-top: 2px; }
 .auth-btn {
   width: 100%; padding: 14px;
   background: linear-gradient(135deg, #6378ff, #38d9a9);
   border: none; border-radius: 12px;
   color: white; font-family: var(--font-body);
   font-size: 15px; font-weight: 600;
-  cursor: pointer; margin-top: 8px;
+  cursor: pointer; margin-top: 24px;
   transition: opacity 0.2s, transform 0.2s;
+  opacity: 0.4; pointer-events: none;
 }
-.auth-btn:hover { opacity: 0.9; transform: translateY(-1px); }
-.auth-error { color: #ff6b6b; font-size: 13px; margin-top: 8px; display: none; }
+.auth-btn.enabled { opacity: 1; pointer-events: auto; }
+.auth-btn:hover.enabled { opacity: 0.9; transform: translateY(-1px); }
 
 /* PARTICLES */
 .particles {
@@ -602,6 +573,120 @@ body {
   color: var(--accent); border: 1px solid rgba(99,120,255,0.2);
 }
 
+/* ===== ENHANCED TEAM PAGE (scoped to #page-team only) ===== */
+#page-team .team-hero-card {
+  background: linear-gradient(160deg, var(--card) 0%, var(--card2) 100%);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 44px 40px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+#page-team .team-hero-card::before {
+  content: '';
+  position: absolute;
+  width: 340px; height: 340px;
+  background: radial-gradient(circle, rgba(99,120,255,0.16) 0%, transparent 70%);
+  top: -120px; right: -100px;
+  border-radius: 50%;
+  pointer-events: none;
+}
+#page-team .team-hero-card::after {
+  content: '';
+  position: absolute;
+  width: 260px; height: 260px;
+  background: radial-gradient(circle, rgba(56,217,169,0.12) 0%, transparent 70%);
+  bottom: -110px; left: -80px;
+  border-radius: 50%;
+  pointer-events: none;
+}
+#page-team .team-hero-inner {
+  position: relative; z-index: 1;
+  display: flex; align-items: center; gap: 32px;
+  flex-wrap: wrap;
+}
+#page-team .team-hero-avatar {
+  width: 132px; height: 132px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display);
+  font-size: 48px; font-weight: 800; color: white;
+  flex-shrink: 0;
+  box-shadow: 0 12px 32px rgba(99,120,255,0.35);
+  border: 3px solid rgba(255,255,255,0.08);
+}
+#page-team .team-hero-status {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.05em;
+  text-transform: uppercase; color: var(--good);
+  background: rgba(56,217,169,0.12);
+  border: 1px solid rgba(56,217,169,0.3);
+  padding: 5px 12px; border-radius: 20px;
+  margin-bottom: 10px;
+}
+#page-team .team-hero-status::before {
+  content: ''; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--good); box-shadow: 0 0 8px var(--good);
+}
+#page-team .team-hero-name {
+  font-family: var(--font-display);
+  font-size: 30px; font-weight: 800;
+  color: var(--text);
+  line-height: 1.15;
+}
+#page-team .team-hero-role {
+  font-size: 14px; color: var(--text2); margin-top: 4px;
+}
+#page-team .team-hero-bio {
+  font-size: 13px; color: var(--text2); line-height: 1.7;
+  margin-top: 16px; max-width: 640px;
+}
+#page-team .team-stat-row {
+  display: flex; gap: 28px; flex-wrap: wrap;
+  margin-top: 22px;
+}
+#page-team .team-stat {
+  text-align: left;
+}
+#page-team .team-stat-val {
+  font-family: var(--font-mono); font-size: 24px; font-weight: 700;
+  color: var(--accent);
+}
+#page-team .team-stat-key {
+  font-size: 11px; color: var(--text3); margin-top: 2px;
+  text-transform: uppercase; letter-spacing: 0.04em;
+}
+#page-team .team-hero-links {
+  display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px;
+}
+#page-team .team-hero-links .team-link {
+  padding: 9px 18px; border-radius: 10px;
+  font-size: 12px; font-weight: 600;
+  transition: all 0.2s;
+}
+#page-team .team-hero-links .team-link.primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: white; border: 1px solid transparent;
+}
+#page-team .team-hero-links .team-link.primary:hover {
+  opacity: 0.9; transform: translateY(-2px);
+}
+#page-team .team-hero-links .team-link:not(.primary):hover {
+  transform: translateY(-2px);
+}
+#page-team .team-hero-tags {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px;
+}
+#page-team .section-title {
+  display: flex; align-items: center; gap: 10px;
+}
+#page-team .section-title::after {
+  content: '';
+  flex: 1; height: 1px;
+  background: linear-gradient(to right, var(--border), transparent);
+}
+
 /* PREDICTION PAGE */
 .filter-tabs { display: flex; gap: 4px; margin-bottom: 20px; }
 .filter-tab {
@@ -783,6 +868,14 @@ body {
   .team-avatar { width: 80px; height: 80px; font-size: 32px; }
   .team-links { flex-wrap: wrap; }
 
+  /* Enhanced team hero card */
+  #page-team .team-hero-card { padding: 28px 20px; }
+  #page-team .team-hero-inner { gap: 20px; }
+  #page-team .team-hero-avatar { width: 96px; height: 96px; font-size: 36px; }
+  #page-team .team-hero-name { font-size: 24px; }
+  #page-team .team-stat-row { gap: 18px; }
+  #page-team .team-stat-val { font-size: 20px; }
+
   /* Indoor plant card */
   .plant-card { flex-wrap: wrap; gap: 10px; }
   .plant-buy-link { margin-left: 0; }
@@ -871,6 +964,12 @@ body {
   /* Team */
   .team-avatar { width: 70px; height: 70px; font-size: 28px; }
   .team-name { font-size: 16px; }
+
+  #page-team .team-hero-inner { flex-direction: column; text-align: center; }
+  #page-team .team-hero-bio { max-width: 100%; }
+  #page-team .team-stat-row { justify-content: center; }
+  #page-team .team-hero-tags { justify-content: center; }
+  #page-team .team-hero-links { justify-content: center; }
 
   /* Kid faces row — 2 per line */
   .kid-aqi-meter { gap: 8px; }
@@ -983,73 +1082,34 @@ body {
 <!-- PARTICLES -->
 <div class="particles" id="particles"></div>
 
-<!-- AUTH SCREEN -->
+<!-- AGE SELECT SCREEN -->
 <div id="auth-screen">
   <div class="auth-container">
     <div class="auth-logo">AirSense</div>
     <div class="auth-subtitle">Mumbai AQI Intelligence Platform</div>
-    <div class="auth-tabs">
-      <button class="auth-tab active" onclick="switchAuthTab('login')">Sign In</button>
-      <button class="auth-tab" onclick="switchAuthTab('signup')">Sign Up</button>
-    </div>
 
-    <div id="login-form">
-      <div class="auth-field">
-        <label>Email Address</label>
-        <input type="email" id="login-email" placeholder="you@example.com"/>
-      </div>
-      <div class="auth-field">
-        <label>Password</label>
-        <input type="password" id="login-pass" placeholder="••••••••"/>
-      </div>
-      <div class="auth-error" id="login-error">Invalid email or password</div>
-      <button class="auth-btn" onclick="doLogin()">Sign In</button>
-      <div style="display:flex;align-items:center;gap:10px;margin-top:16px;">
-        <div style="flex:1;height:1px;background:rgba(99,120,255,0.15);"></div>
-        <span style="font-size:12px;color:#555f8a;">or try a demo</span>
-        <div style="flex:1;height:1px;background:rgba(99,120,255,0.15);"></div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;">
-        <button onclick="demoLogin('kid')"   style="padding:10px 6px;border-radius:10px;border:1.5px solid rgba(255,107,53,0.4);background:rgba(255,107,53,0.08);color:#ff6b35;font-family:var(--font-body);font-size:12px;font-weight:600;cursor:pointer;">Explorer (10–16)</button>
-        <button onclick="demoLogin('youth')" style="padding:10px 6px;border-radius:10px;border:1.5px solid rgba(99,120,255,0.4);background:rgba(99,120,255,0.08);color:#7b8fff;font-family:var(--font-body);font-size:12px;font-weight:600;cursor:pointer;">Youth (17–34)</button>
-        <button onclick="demoLogin('adult')" style="padding:10px 6px;border-radius:10px;border:1.5px solid rgba(63,94,251,0.4);background:rgba(63,94,251,0.08);color:#3f5efb;font-family:var(--font-body);font-size:12px;font-weight:600;cursor:pointer;">Adult (35–55)</button>
-        <button onclick="demoLogin('senior')" style="padding:10px 6px;border-radius:10px;border:1.5px solid rgba(0,82,204,0.4);background:rgba(0,82,204,0.08);color:#0052cc;font-family:var(--font-body);font-size:12px;font-weight:600;cursor:pointer;">Senior (56+)</button>
-      </div>
-    </div>
-
-    <div id="signup-form" style="display:none">
-      <div class="auth-field">
-        <label>Email Address</label>
-        <input type="email" id="signup-email" placeholder="you@example.com"/>
-      </div>
-      <div class="auth-field">
-        <label>Password</label>
-        <input type="password" id="signup-pass" placeholder="Create password"/>
-      </div>
-      <div class="auth-field">
-        <label>Select Your Age Group</label>
-        <div class="age-group-grid">
-          <div class="age-option" onclick="selectAge('kid')" id="age-kid">
-            <div class="age-label">10–16 Years</div>
-            <div class="age-desc">Explorer Mode</div>
-          </div>
-          <div class="age-option" onclick="selectAge('youth')" id="age-youth">
-            <div class="age-label">17–34 Years</div>
-            <div class="age-desc">Youth Mode</div>
-          </div>
-          <div class="age-option" onclick="selectAge('adult')" id="age-adult">
-            <div class="age-label">35–55 Years</div>
-            <div class="age-desc">Professional</div>
-          </div>
-          <div class="age-option" onclick="selectAge('senior')" id="age-senior">
-            <div class="age-label">56+ Years</div>
-            <div class="age-desc">Comfort Mode</div>
-          </div>
+    <div class="auth-field">
+      <label style="display:block;font-size:13px;color:#8891bb;margin-bottom:10px;">Select Your Age Group to Continue</label>
+      <div class="age-group-grid">
+        <div class="age-option" onclick="selectAge('kid')" id="age-kid">
+          <div class="age-label">10–16 Years</div>
+          <div class="age-desc">Explorer Mode</div>
+        </div>
+        <div class="age-option" onclick="selectAge('youth')" id="age-youth">
+          <div class="age-label">17–34 Years</div>
+          <div class="age-desc">Youth Mode</div>
+        </div>
+        <div class="age-option" onclick="selectAge('adult')" id="age-adult">
+          <div class="age-label">35–55 Years</div>
+          <div class="age-desc">Professional</div>
+        </div>
+        <div class="age-option" onclick="selectAge('senior')" id="age-senior">
+          <div class="age-label">56+ Years</div>
+          <div class="age-desc">Comfort Mode</div>
         </div>
       </div>
-      <div class="auth-error" id="signup-error">Please fill all fields</div>
-      <button class="auth-btn" onclick="doSignup()">Create Account</button>
     </div>
+    <button class="auth-btn" id="age-continue-btn" onclick="confirmAgeAndLaunch()">Continue</button>
   </div>
 </div>
 
@@ -1069,7 +1129,7 @@ body {
     <div class="nav-right">
       <div class="nav-aqi-badge" id="nav-aqi-badge" style="background:rgba(255,146,43,0.15);color:#ff922b;">AQI 158</div>
       <div class="theme-badge" id="theme-badge">YOUTH</div>
-      <div class="nav-user" id="nav-user" onclick="doLogout()">U</div>
+      <div class="nav-user" id="nav-user" onclick="doLogout()" title="Change age group">U</div>
       <button class="nav-hamburger" id="hamburger" onclick="toggleMobileNav()" aria-label="Menu">
         <span class="hamburger-line"></span>
         <span class="hamburger-line"></span>
@@ -1086,8 +1146,8 @@ body {
     <button class="nav-link" onclick="showPage('news');closeMobileNav()">News</button>
     <button class="nav-link" onclick="showPage('team');closeMobileNav()">Our Team</button>
     <div style="border-top:1px solid var(--border);margin-top:8px;padding-top:10px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
-      <span style="font-size:13px;color:var(--text2);">Signed in as <strong id="mobile-email-label" style="color:var(--text)"></strong></span>
-      <button onclick="doLogout()" style="background:rgba(255,107,107,0.15);border:1px solid rgba(255,107,107,0.3);color:#ff6b6b;padding:6px 12px;border-radius:8px;font-size:12px;cursor:pointer;font-family:var(--font-body);">Sign Out</button>
+      <span style="font-size:13px;color:var(--text2);">Mode: <strong id="mobile-email-label" style="color:var(--text)"></strong></span>
+      <button onclick="doLogout()" style="background:rgba(255,107,107,0.15);border:1px solid rgba(255,107,107,0.3);color:#ff6b6b;padding:6px 12px;border-radius:8px;font-size:12px;cursor:pointer;font-family:var(--font-body);">Change Age Group</button>
     </div>
   </div>
 
@@ -1103,7 +1163,7 @@ body {
         </div>
         <div id="senior-welcome" style="display:none;">
           <div style="font-size:28px; font-weight:700; font-family:Syne,sans-serif; color:var(--text); margin-bottom:8px;">Good Morning! Stay Safe Today.</div>
-          <button class="voice-btn" onclick="readAloud()">Read Page Aloud</button>
+          <button class="voice-btn" id="voice-btn-el" onclick="toggleReadAloud()">🔊 Read Page Aloud</button>
         </div>
 
         <!-- HEALTH ALERT -->
@@ -1821,47 +1881,47 @@ body {
       <div class="container">
         <div class="page-title">Our Team</div>
         <div class="page-sub">The researchers and engineers behind AirSense Mumbai</div>
-        <div class="grid-3" style="margin-bottom:40px;">
-          <div class="team-card">
-            <div class="team-avatar">IM</div>
-            <div class="team-name">Iqra Miyaji</div>
-            <div class="team-degree">B.Tech — Data Science</div>
-            <div class="team-achievements">
-              <!-- <span class="achievement-tag"></span> -->
-              <span class="achievement-tag">Research Paper</span>
-              <span class="achievement-tag">CUNY Intern</span>
-            </div>
-            <div class="team-links">
-              <a href="#" onclick="window.location='mai'+'lto:miyajiiqra'+'@gmail.com';return false;" class="team-link">Email</a>
-              <a href="https://www.linkedin.com/in/iqra-miyaji-/" target="_blank" class="team-link">LinkedIn</a>
-            </div>
-          </div>
-          <div class="team-card">
-            <div class="team-avatar" style="background:linear-gradient(135deg,#f093fb,#f5576c);">RJ</div>
-            <div class="team-name">Reshma Jaiswar</div>
-            <div class="team-degree">B.Tech — Data Science</div>
-            <div class="team-achievements">
-              <!-- <span class="achievement-tag">AI Researcher</span> -->
-              <span class="achievement-tag">Data Analyst</span>
-              <span class="achievement-tag">CUNY Intern</span>
-            </div>
-            <div class="team-links">
-              <a href="#" onclick="window.location='mai'+'lto:reshmajaiswar7'+'@gmail.com';return false;" class="team-link">Email</a>
-              <a href="https://l1nk.dev/3bha5hl" target="_blank" class="team-link">LinkedIn</a>
-            </div>
-          </div>
-          <div class="team-card">
-            <div class="team-avatar" style="background:linear-gradient(135deg,#4facfe,#00f2fe);">DC</div>
-            <div class="team-name">Dhwani Chheda</div>
-            <div class="team-degree">B.Tech — Data Science</div>
-            <div class="team-achievements">
-              <span class="achievement-tag">Data Analyst</span>
-              <!-- <span class="achievement-tag">UI Designer</span> -->
-              <span class="achievement-tag">Internship</span>
-            </div>
-            <div class="team-links">
-              <a href="#" onclick="window.location='mai'+'lto:dchheda172'+'@gmail.com';return false;" class="team-link">Email</a>
-              <a href="https://l1nk.dev/fuizvcx" target="_blank" class="team-link">LinkedIn</a>
+        <div class="team-hero-card" style="margin-bottom:40px;">
+          <div class="team-hero-inner">
+            <div class="team-hero-avatar">IM</div>
+            <div style="flex:1;min-width:260px;">
+              <div class="team-hero-name">Iqra Miyaji</div>
+              <div class="team-hero-role">B.Tech Data Science Student · Data Engineer / Analyst</div>
+              <div class="team-hero-bio">Data Science undergraduate skilled in SQL, Python, Excel, Power BI, and Tableau, with experience in ETL and databases. Collaborative and integrity-driven, with a track record of turning data into practical insights through internships and research — including hands-on work in satellite data fusion, AQI forecasting, and deep learning for real-world air quality systems.</div>
+
+              <div class="team-stat-row">
+                <div class="team-stat">
+                  <div class="team-stat-val">7.735</div>
+                  <div class="team-stat-key">CGPA</div>
+                </div>
+                <div class="team-stat">
+                  <div class="team-stat-val">3</div>
+                  <div class="team-stat-key">Publications</div>
+                </div>
+                <div class="team-stat">
+                  <div class="team-stat-val">3</div>
+                  <div class="team-stat-key">Shipped Projects</div>
+                </div>
+                <div class="team-stat">
+                  <div class="team-stat-val">3</div>
+                  <div class="team-stat-key">Internships</div>
+                </div>
+              </div>
+
+              <div class="team-hero-tags">
+                <span class="achievement-tag">Research Paper</span>
+                <span class="achievement-tag">CUNY Intern</span>
+                <span class="achievement-tag">1st Prize — Project Exhibition</span>
+                <span class="achievement-tag">Meta CraftLab Intern</span>
+              </div>
+
+              <div class="team-hero-links">
+                <a href="https://iqramiyaji.github.io/Data_Engineer/" target="_blank" class="team-link primary">🌐 View Portfolio</a>
+                <a href="#" onclick="window.location='mai'+'lto:miyajiiqra'+'@gmail.com';return false;" class="team-link">✉ Email</a>
+                <a href="https://www.linkedin.com/in/iqra-miyaji-/" target="_blank" class="team-link">LinkedIn</a>
+                <a href="https://github.com/IqraMiyaji/" target="_blank" class="team-link">GitHub</a>
+                <a href="https://medium.com/@miyajiiqra" target="_blank" class="team-link">Medium</a>
+              </div>
             </div>
           </div>
         </div>
@@ -1992,61 +2052,35 @@ let chatOpen = false;
 let charts = {};
 let OPENAI_KEY = '';
 
-// ===== AUTH =====
+// ===== AGE SELECTION (replaces auth) =====
 let selectedAgeGroup = null;
 function selectAge(group) {
   selectedAgeGroup = group;
   document.querySelectorAll('.age-option').forEach(el => el.classList.remove('selected'));
   document.getElementById('age-'+group).classList.add('selected');
+  document.getElementById('age-continue-btn').classList.add('enabled');
 }
-function switchAuthTab(tab) {
-  document.querySelectorAll('.auth-tab').forEach(el => el.classList.remove('active'));
-  event.target.classList.add('active');
-  document.getElementById('login-form').style.display = tab==='login' ? 'block' : 'none';
-  document.getElementById('signup-form').style.display = tab==='signup' ? 'block' : 'none';
-}
-function demoLogin(ageGroup) {
-  currentUser = { email: 'demo@airsense.app', ageGroup };
-  currentAgeGroup = ageGroup;
-  launchApp();
-}
-function doLogin() {
-  document.getElementById('login-error').style.display='none';
-  const email = document.getElementById('login-email').value;
-  const pass = document.getElementById('login-pass').value;
-  if (!email || !pass) { document.getElementById('login-error').style.display='block'; return; }
-  const saved = JSON.parse(localStorage.getItem('airsense-users')||'{}');
-  if (saved[email] && saved[email].password === pass) {
-    currentUser = { email, ageGroup: saved[email].ageGroup };
-    currentAgeGroup = currentUser.ageGroup;
-    launchApp();
-  } else {
-    document.getElementById('login-error').style.display='block';
-  }
-}
-function doSignup() {
-  const email = document.getElementById('signup-email').value;
-  const pass = document.getElementById('signup-pass').value;
-  if (!email || !pass || !selectedAgeGroup) {
-    document.getElementById('signup-error').style.display='block'; return;
-  }
-  const saved = JSON.parse(localStorage.getItem('airsense-users')||'{}');
-  saved[email] = { password: pass, ageGroup: selectedAgeGroup };
-  localStorage.setItem('airsense-users', JSON.stringify(saved));
-  currentUser = { email, ageGroup: selectedAgeGroup };
+function confirmAgeAndLaunch() {
+  if (!selectedAgeGroup) return;
+  currentUser = { ageGroup: selectedAgeGroup };
   currentAgeGroup = selectedAgeGroup;
   launchApp();
 }
 function doLogout() {
+  if('speechSynthesis' in window) window.speechSynthesis.cancel();
   document.getElementById('app').style.display='none';
   document.getElementById('auth-screen').style.display='flex';
   currentUser = null;
+  selectedAgeGroup = null;
+  document.querySelectorAll('.age-option').forEach(el => el.classList.remove('selected'));
+  document.getElementById('age-continue-btn').classList.remove('enabled');
 }
 function launchApp() {
   document.getElementById('auth-screen').style.display='none';
   document.getElementById('app').style.display='block';
+  const labelMap = { kid:'Explorer Mode', youth:'Youth Mode', adult:'Professional', senior:'Comfort Mode' };
   const emailLabel = document.getElementById('mobile-email-label');
-  if(emailLabel) emailLabel.textContent = currentUser?.email || '';
+  if(emailLabel) emailLabel.textContent = labelMap[currentAgeGroup] || '';
   applyTheme();
   initApp();
 }
@@ -2070,8 +2104,8 @@ function applyTheme() {
   body.classList.add(themeMap[currentAgeGroup] || 'theme-youth');
   const labelMap = { kid:'EXPLORER', youth:'YOUTH', adult:'PRO', senior:'COMFORT' };
   document.getElementById('theme-badge').textContent = labelMap[currentAgeGroup];
-  const initial = (currentUser?.email||'U')[0].toUpperCase();
-  document.getElementById('nav-user').textContent = initial;
+  const initialMap = { kid:'K', youth:'Y', adult:'A', senior:'S' };
+  document.getElementById('nav-user').textContent = initialMap[currentAgeGroup] || 'U';
   document.getElementById('kid-welcome').style.display = currentAgeGroup==='kid' ? 'block' : 'none';
   document.getElementById('senior-welcome').style.display = currentAgeGroup==='senior' ? 'block' : 'none';
   document.getElementById('kid-badges').style.display = currentAgeGroup==='kid' ? 'block' : 'none';
@@ -2618,14 +2652,25 @@ function showTyping(show) {
 }
 
 // ===== VOICE ASSIST (senior) =====
-function readAloud() {
-  const text = `Current Mumbai AQI is 158, which is Unhealthy for Sensitive Groups. People with respiratory conditions should limit outdoor activity. Wear N95 masks if you must go out. Keep windows closed between 8 AM and 12 PM when pollution is highest.`;
-  if('speechSynthesis' in window) {
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 0.85;
-    utterance.pitch = 1;
-    window.speechSynthesis.speak(utterance);
+function toggleReadAloud() {
+  if(!('speechSynthesis' in window)) return;
+  const btn = document.getElementById('voice-btn-el');
+
+  // If currently speaking (or paused), stop it — this is the toggle-off action
+  if(window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+    window.speechSynthesis.cancel();
+    if(btn) btn.innerHTML = '🔊 Read Page Aloud';
+    return;
   }
+
+  const text = `Current Mumbai AQI is 158, which is Unhealthy for Sensitive Groups. People with respiratory conditions should limit outdoor activity. Wear N95 masks if you must go out. Keep windows closed between 8 AM and 12 PM when pollution is highest.`;
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.rate = 0.85;
+  utterance.pitch = 1;
+  utterance.onend = () => { if(btn) btn.innerHTML = '🔊 Read Page Aloud'; };
+  utterance.onerror = () => { if(btn) btn.innerHTML = '🔊 Read Page Aloud'; };
+  if(btn) btn.innerHTML = '⏹ Stop Reading';
+  window.speechSynthesis.speak(utterance);
 }
 
 // ===== AUTO-REFRESH =====
